@@ -10,7 +10,6 @@ class App(tk.Tk):
         for F in (registerPage.registerGUI, testsPage.testsGUI):
             frame = F(self)
             self.frames[F] = frame
-            frame.grid(row=0, column=0, sticky="nsew")
 
         self.show_frame(registerPage.registerGUI)
 
@@ -37,4 +36,4 @@ if __name__ == "__main__":
 
 #TODO: SEPARATE THE GUI AND FUNCTIONS INTO SEPARATE FILES
 #PS: TODO IS A LIE
-#PPS: READ 25th LINE
+#PPS: READ OVER 1 LINE ABOVE
