@@ -1,7 +1,5 @@
 import tkinter as tk
-
-def test_function():
-    print('Button clicked!')
+from functions import exit 
 
 # Main window declaration or someshit idk I aint reading all that
 root = tk.Tk()
@@ -16,8 +14,8 @@ root.state('zoomed')  # Maximize the window
 label = tk.Label(root, text='Hello There!')
 label.pack()
 
-button = tk.Button(root, text='Click My Balls', command=test_function)
-button.pack()
+exitButton = tk.Button(root, text='Exit?', command=lambda: exit.closeWindow(root))
+exitButton.pack()
 
 entry = tk.Entry(root)
 entry.pack()
