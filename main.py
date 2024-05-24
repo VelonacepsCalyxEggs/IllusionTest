@@ -1,20 +1,14 @@
 import tkinter as tk
 from functions import exit 
-from gui import registerPage, testsPage
-
+from gui import registerPage
 class App(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.frames = {}
-
-        for F in (registerPage.registerGUI, testsPage.testsGUI):
-            frame = F(self)
-            self.frames[F] = frame
 
         self.show_frame(registerPage.registerGUI)
 
     def show_frame(self, context):
-        frame = self.frames[context]
+        frame = registerPage.registerGUI(self)
         frame.tkraise()
 
 
@@ -25,6 +19,7 @@ if __name__ == "__main__":
     app = App()
     
     app.title('Illusion Test')
+    app.iconbitmap("./gui/res/logo.ico")
 
     # Make it resize to full screen, avoided using the fullscreen true parameter since we probable would want to use the width and height values as globals
     width = app.winfo_screenwidth()

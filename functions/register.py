@@ -1,5 +1,5 @@
 import webbrowser
-
+from database import databaseManager
 def register(name, age, gender):
         # Example registration logic
         if name == "" or age == "" or gender == "Select Gender":
@@ -19,5 +19,10 @@ def register(name, age, gender):
             print("Name:", name)
             print("Age:", age)
             print("Gender:", gender)
+
+            # Write user to DB
+            db = databaseManager.Manager()
+            db.saveTestSubject(name=name, age=age, gender=gender)
+
             # Show a success message
             return "Registration Successful", "You have been registered successfully!"
