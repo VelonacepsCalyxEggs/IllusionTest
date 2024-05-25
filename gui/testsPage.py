@@ -71,6 +71,7 @@ def switchPage(self, page):
     if (page == 1):
         # Hide the current frame
         self.grid_forget()
-        poggendorphIllusion.PoggendorffIllusion()
+        illusion_frame = poggendorphIllusion.PoggendorffIllusion()
+        illusion_frame.grid()
     else:
         return

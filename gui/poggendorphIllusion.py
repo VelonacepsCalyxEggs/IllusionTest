@@ -7,7 +7,7 @@ if __name__ == '__main__':
 
 from utils.geometry_utils import Vector2D, Line
 
-class PoggendorffIllusion(tk.Tk):
+class PoggendorffIllusion(tk.Frame):
     w_param = 10 # width of the wall
     h_param = 0 # offest of second line
     alpha = 45 # angle of the diagonal line
@@ -17,13 +17,17 @@ class PoggendorffIllusion(tk.Tk):
         super().__init__()
 
         # Create canvas
-        self.title('Poggendorff Illusion')
-        self.canvas = tk.Canvas(self, width=400, height=300)
-        self.canvas.grid()
+        self.canvas = tk.Canvas(self, width=512, height=512)
+        self.canvas.grid(row=0, column=0, sticky='nsew')
+
+        # Configure the row and column weights where the canvas is placed
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+
         self.draw_illusion()
 
         # Create slider to adjust the line position
-        self.slider = tk.Scale(self, from_=0, to=200, orient='horizontal', command=self.adjust_line)
+        self.slider = tk.Scale(self, from_=0, to=384, orient='horizontal', command=self.adjust_line)
         self.slider.grid()
 
         # system buttons to redraw the illusion and sliders to adjast values
@@ -75,32 +79,33 @@ class PoggendorffIllusion(tk.Tk):
         print(self.w_param, self.h_param, self.alpha, self.beta)
 
         #Vertical lines using the Line class
-        line1 = Line(Vector2D(100, 0), Vector2D(0,1), 200)
+        line1 = Line(Vector2D(128, 0), Vector2D(0,1), 200)
         line1.swap_origin()
         line1.rotate(self.beta)
         self.canvas.create_line(line1.org.x, line1.org.y, line1.secn.x, line1.secn.y, fill='black', width=1)
         
-        line2 = Line(Vector2D(100+self.w_param, 0), Vector2D(0,1), 200)
+        line2 = Line(Vector2D(128+self.w_param, 0), Vector2D(0,1), 200)
         line2.swap_origin()
         line2.rotate(self.beta)
         self.canvas.create_line(line2.org.x, line2.org.y, line2.secn.x, line2.secn.y, fill='black', width=1)
 
         # Diagonal line using the Line class
-        main_line = Line(Vector2D(100, 75), Vector2D(-1,0), 50)
+        main_line = Line(Vector2D(128, 75), Vector2D(-1,0), 50)
         main_line.rotate(self.alpha)
         self.canvas.create_line(main_line.org.x, main_line.org.y, main_line.secn.x, main_line.secn.y, fill='red', width=2)
 
-        addional_line = Line(Vector2D(100+self.w_param, 75 + self.h_param), Vector2D(1,0), 50)
+        addional_line = Line(Vector2D(128+self.w_param, 75 + self.h_param), Vector2D(1,0), 50)
         addional_line.rotate(self.alpha)
         self.canvas.create_line(addional_line.org.x, addional_line.org.y, addional_line.secn.x, addional_line.secn.y, fill='blue', width=2)
 
         # Continuous line with the same angle as the diagonal line using the Line class
-        continuous_line = Line(Vector2D(100+self.w_param, 70), Vector2D(1,0), 50)
+        continuous_line = Line(Vector2D(128+self.w_param, 70), Vector2D(1,0), 50)
         continuous_line.rotate(self.alpha)
         
         self.continuous_line = self.canvas.create_line(continuous_line.org.x, continuous_line.org.y, 
                                                        continuous_line.secn.x, continuous_line.secn.y, 
                                                        fill='red', width=2)
+        self.canvas.scale('all', 0, 0, 2, 2) # TODO: Look into how the elements are positioned, currently this is causing problems.
 
 
     def adjust_alpha(self, value):
