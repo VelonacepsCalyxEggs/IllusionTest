@@ -74,6 +74,3 @@ def switchPage(self, page):
         poggendorphIllusion.PoggendorffIllusion()
     else:
         return
-    # Configure the master grid to center the new frame
-    self.master.grid_rowconfigure(0, weight=1)
-    self.master.grid_columnconfigure(0, weight=1)
