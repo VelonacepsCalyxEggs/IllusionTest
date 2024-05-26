@@ -33,7 +33,8 @@ class PoggendorffIllusion(tk.Frame):
         self.counter.grid()
 
         # Create slider to adjust the line position
-        self.slider = tk.Scale(self, from_=0, to=384, orient='horizontal', command=self.adjust_line)
+        self.slider = tk.Scale(self, from_=0, to=200, orient='horizontal', command=self.adjust_line)
+        self.slider.set(70)
         self.slider.grid()
         
         self.NextButton = tk.Button(self, text='Submit', command=self.submit_data)
@@ -89,7 +90,7 @@ class PoggendorffIllusion(tk.Frame):
         self.w_param = random.randint(1, 10) # width of the wall
         self.h_param = 0 # offset of second line
         self.alpha = random.randint(10, 80) # angle of the diagonal line
-        #self.beta = random.randint(0, 360) # angle of illusion itself
+        self.beta = random.randint(0, 360) # angle of illusion itself
 
         # If user had reached 10 illusions, we redirect to the tests page.
         # On the tests page, we show the user a message box with info that he had completed this test. i.e prob verified by database query.
@@ -104,38 +105,46 @@ class PoggendorffIllusion(tk.Frame):
 
         return
 
-    def draw_illusion(self):
+    def draw_illusion(self, line_pos=0):
 
         # Clear the canvas
         self.canvas.delete('all')
         print(self.w_param, self.h_param, self.alpha, self.beta)
 
+        
         #Vertical lines using the Line class
         line1 = Line(Vector2D(128, 0), Vector2D(0,1), 200)
         line1.swap_origin()
-        line1.rotate(self.beta)
-        self.canvas.create_line(line1.org.x, line1.org.y, line1.secn.x, line1.secn.y, fill='black', width=1)
-        
+
         line2 = Line(Vector2D(128+self.w_param, 0), Vector2D(0,1), 200)
         line2.swap_origin()
-        line2.rotate(self.beta)
+        
+        self.center = Vector2D((line1.org.x + line2.org.x)/2, line1.len/2)
+        line1.rotate_around_point(self.beta, self.center)
+        line2.rotate_around_point(self.beta, self.center)
+
         self.canvas.create_line(line2.org.x, line2.org.y, line2.secn.x, line2.secn.y, fill='black', width=1)
+        self.canvas.create_line(line1.org.x, line1.org.y, line1.secn.x, line1.secn.y, fill='black', width=1)
+        
 
         # Diagonal line using the Line class
         main_line = Line(Vector2D(128, 75), Vector2D(-1,0), 50)
         main_line.rotate(self.alpha)
+        main_line.rotate_around_point(self.beta, self.center)
         self.canvas.create_line(main_line.org.x, main_line.org.y, main_line.secn.x, main_line.secn.y, fill='red', width=2)
 
         addional_line = Line(Vector2D(128+self.w_param, 75 + self.h_param), Vector2D(1,0), 50)
         addional_line.rotate(self.alpha)
+        addional_line.rotate_around_point(self.beta, self.center)
         self.canvas.create_line(addional_line.org.x, addional_line.org.y, addional_line.secn.x, addional_line.secn.y, fill='blue', width=2)
 
         # Continuous line with the same angle as the diagonal line using the Line class
-        continuous_line = Line(Vector2D(128+self.w_param, 70), Vector2D(1,0), 50)
-        continuous_line.rotate(self.alpha)
+        self.continuous_line = Line(Vector2D(128+self.w_param, 0 + line_pos), Vector2D(1,0), 50)
+        self.continuous_line.rotate(self.alpha)
+        self.continuous_line.rotate_around_point(self.beta, self.center)
         
-        self.continuous_line = self.canvas.create_line(continuous_line.org.x, continuous_line.org.y, 
-                                                       continuous_line.secn.x, continuous_line.secn.y, 
+        self.continuous_line_obj = self.canvas.create_line(self.continuous_line.org.x, self.continuous_line.org.y, 
+                                                       self.continuous_line.secn.x, self.continuous_line.secn.y, 
                                                        fill='red', width=2)
         self.canvas.scale('all', 0, 0, 2, 2) # TODO: Look into how the elements are positioned, currently this is causing problems.
 
@@ -152,17 +161,9 @@ class PoggendorffIllusion(tk.Frame):
     def adjust_w(self, value):
         self.w_param = int(value)
 
-    def adjust_line(self, value):
-        # Calculate the original slope of the diagonal line
-        x0, y0, x1, y1_diagonal = self.canvas.coords(self.continuous_line)
-        slope_diagonal = (y1_diagonal - y0) / (x1 - x0)
+    def adjust_line(self, value):          
+        self.draw_illusion(int(value))
 
-        # Calculate the new y0 and y1 based on the slider value and original slope
-        y0_new = int(value)
-        y1_new = y0_new + slope_diagonal * (x1 - x0)
-
-        # Adjust the line coordinates
-        self.canvas.coords(self.continuous_line, x0, y0_new, x1, y1_new)
     def switchPage(self):
         # Hide the current frame
         self.grid_forget()

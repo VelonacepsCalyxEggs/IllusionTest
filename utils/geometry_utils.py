@@ -29,7 +29,6 @@ class Vector2D():
         if isinstance(param, Vector2D):
             return self.x * param.y - self.y * param.x 
         return Vector2D(self.x * param, self.y * param)
-    
 
     def __str__(self):
         '''
@@ -74,6 +73,18 @@ class Line():
         '''
         self.dir = self.dir.rotate(angle)
         self.calculate_second()
+
+    def rotate_around_point(self, angle, point: Vector2D):
+        '''
+        rotates the line around a given point by the given angle
+        '''
+        self.org = self.org - point
+        self.secn = self.secn - point
+        self.org = self.org.rotate(angle)
+        self.secn = self.secn.rotate(angle)
+        self.org = self.org + point
+        self.secn = self.secn + point
+        self.dir = self.secn - self.org
 
     def swap_origin(self):
         '''
