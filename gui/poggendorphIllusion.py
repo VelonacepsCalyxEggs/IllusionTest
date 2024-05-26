@@ -1,5 +1,7 @@
 import tkinter as tk
+from gui import testsPage
 import sys
+import random
 
 if __name__ == '__main__':
     current_absolute_path = sys.path[0][:sys.path[0].rfind('\\')]
@@ -9,9 +11,10 @@ from utils.geometry_utils import Vector2D, Line
 
 class PoggendorffIllusion(tk.Frame):
     w_param = 10 # width of the wall
-    h_param = 0 # offest of second line
+    h_param = 0 # offset of second line
     alpha = 45 # angle of the diagonal line
     beta = 0 # angle of illusion itself
+    illNum = 0 # number of the generated illusion
 
     def __init__(self):
         super().__init__()
@@ -26,9 +29,15 @@ class PoggendorffIllusion(tk.Frame):
 
         self.draw_illusion()
 
+        self.counter = tk.Label(self, text=self.illNum)
+        self.counter.grid()
+
         # Create slider to adjust the line position
         self.slider = tk.Scale(self, from_=0, to=384, orient='horizontal', command=self.adjust_line)
         self.slider.grid()
+        
+        self.NextButton = tk.Button(self, text='Submit', command=self.submit_data)
+        self.NextButton.grid()
 
         # system buttons to redraw the illusion and sliders to adjast values
         self.debug_lables_title = tk.Label(self, text='Debug controls')
@@ -71,6 +80,29 @@ class PoggendorffIllusion(tk.Frame):
         self.slider_beta = tk.Scale(self, from_=0, to=360, orient='horizontal', command=self.adjust_beta)
         self.slider_beta.set(self.beta)
         self.slider_beta.grid()
+
+    def submit_data(self):
+        
+        # SEND DATA TO SQL DB
+
+        # Generate a new illusion
+        self.w_param = random.randint(1, 10) # width of the wall
+        self.h_param = 0 # offset of second line
+        self.alpha = random.randint(10, 80) # angle of the diagonal line
+        #self.beta = random.randint(0, 360) # angle of illusion itself
+
+        # If user had reached 10 illusions, we redirect to the tests page.
+        # On the tests page, we show the user a message box with info that he had completed this test. i.e prob verified by database query.
+        if self.illNum != 10:
+            self.draw_illusion()
+
+            self.illNum = self.illNum + 1
+            self.counter.configure(text=self.illNum)
+        else:
+            self.switchPage()
+
+
+        return
 
     def draw_illusion(self):
 
@@ -131,6 +163,15 @@ class PoggendorffIllusion(tk.Frame):
 
         # Adjust the line coordinates
         self.canvas.coords(self.continuous_line, x0, y0_new, x1, y1_new)
+    def switchPage(self):
+        # Hide the current frame
+        self.grid_forget()
+        # Create and show a new frame or page using the grid manager
+        newPage = testsPage.testsGUI(self.master)
+        newPage.grid(row=0, column=0, sticky="nsew")
+        # Configure the master grid to center the new frame
+        self.master.grid_rowconfigure(0, weight=1)
+        self.master.grid_columnconfigure(0, weight=1)
 
 if __name__ == '__main__':
     app = PoggendorffIllusion()
