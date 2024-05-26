@@ -44,6 +44,12 @@ class Vector2D():
         x = self.x * math.cos(angle) - self.y * math.sin(angle)
         y = self.x * math.sin(angle) + self.y * math.cos(angle)
         return Vector2D(x, y)
+    
+    def magnitude(self):
+        '''
+        returns the magnitude of the vector
+        '''
+        return math.sqrt(self.x ** 2 + self.y ** 2)
 
 class Line():
     '''
@@ -98,4 +104,25 @@ class Line():
         returns a string representation of the line
         '''
         return f"({self.org}, {self.secn}, {self.dir}, {self.len})"
+    
+    def calculate_intersection(self, line1, line2):
+        '''
+        calculates the intersection point of two lines
+        '''
+        a1 = line1.secn.y - line1.org.y
+        b1 = line1.org.x - line1.secn.x
+        c1 = a1 * line1.org.x + b1 * line1.org.y
+
+        a2 = line2.secn.y - line2.org.y
+        b2 = line2.org.x - line2.secn.x
+        c2 = a2 * line2.org.x + b2 * line2.org.y
+
+        det = a1 * b2 - a2 * b1
+
+        if det == 0:
+            return False
+        else:
+            x = (b2 * c1 - b1 * c2) / det
+            y = (a1 * c2 - a2 * c1) / det
+            return Vector2D(x, y)
     

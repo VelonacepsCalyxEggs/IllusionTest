@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import messagebox
 from gui import testsPage
 from functions import register
+from database import databaseManager
 class registerGUI(tk.Frame):
     def __init__(self, master):
         super().__init__(master)
@@ -57,13 +58,23 @@ def attemptRegistration(self):
             messagebox.showerror("Registration Failed", regMessage)
         else:
             messagebox.showinfo("Registration Successful", regMessage)
-            switchPage(self)
+            user_id = None
+            try: 
+                db = databaseManager.Manager()
+                user_id = db.getTestSubjectId(name, age)
+            except Exception as e:
+                messagebox.showerror(
+                    "Database Error", 
+                    f"An error occurred while trying to retrieve the user ID\n{e}"
+                    )
+            
+            switchPage(self, user_id)
 
-def switchPage(self):
+def switchPage(self, user_id):
     # Hide the current frame
     self.grid_forget()
     # Create and show a new frame or page using the grid manager
-    newPage = testsPage.testsGUI(self.master)
+    newPage = testsPage.testsGUI(self.master, user_id)
     newPage.grid(row=0, column=0, sticky="nsew")
     # Configure the master grid to center the new frame
     self.master.grid_rowconfigure(0, weight=1)

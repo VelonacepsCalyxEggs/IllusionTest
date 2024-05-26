@@ -1,12 +1,12 @@
 import tkinter as tk
 from PIL import Image, ImageTk
 from database import databaseManager
-from gui import poggendorphIllusion
+from gui import poggendorphIllusion, mullerLyerIllusion
 
 db = databaseManager.Manager()
 
 class testsGUI(tk.Frame):
-    def __init__(self, master):
+    def __init__(self, master, user_id: int):
         super().__init__(master)
         self.grid(row=0, column=0, sticky="nsew")
         
@@ -56,7 +56,7 @@ class testsGUI(tk.Frame):
         for col in range(len(tests)):
             i += 1
             def create_button_callback(page):
-                return lambda: switchPage(self=self, page=page)
+                return lambda: switchPage(self=self, page=page, user_id=user_id)
             
             test_button = tk.Button(self, text="Start", command=create_button_callback(i))
             test_button.grid(row=3, column=col, padx=10, pady=13, sticky="ew")
@@ -65,13 +65,18 @@ class testsGUI(tk.Frame):
             for col in range(len(tests)):
                 self.grid_columnconfigure(col, weight=1)
 
-def switchPage(self, page):
+def switchPage(self, page, user_id: int):
     # Create and show a new frame or page using the grid manager
     print(page)
     if (page == 1):
         # Hide the current frame
         self.grid_forget()
-        illusion_frame = poggendorphIllusion.PoggendorffIllusion()
+        illusion_frame = poggendorphIllusion.PoggendorffIllusion(user_id=user_id)
+        illusion_frame.grid()
+    elif (page == 2):
+        # Hide the current frame
+        self.grid_forget()
+        illusion_frame = mullerLyerIllusion.MullerLyerIllusion(user_id=user_id)
         illusion_frame.grid()
     else:
         return

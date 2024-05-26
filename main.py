@@ -1,6 +1,6 @@
 import tkinter as tk
 from functions import exit 
-from gui import registerPage, poggendorphIllusion
+from gui import registerPage
 class App(tk.Tk):
     def __init__(self):
         super().__init__()

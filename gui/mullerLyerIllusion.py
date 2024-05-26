@@ -4,7 +4,7 @@ import random
 from utils.geometry_utils import Vector2D, Line
 from database import databaseManager
 
-class PoggendorffIllusion(tk.Frame):
+class MullerLyerIllusion(tk.Frame):
     w_param = 10 # width of the wall
     h_param = 0 # offset of second line
     alpha = 45 # angle of the diagonal line
