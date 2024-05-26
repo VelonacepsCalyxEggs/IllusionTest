@@ -77,7 +77,11 @@ class Manager():
             return e
 
     def saveTestSubject(self, name:str, age:int, gender:str):
-        try: 
+        '''Save the test subject with the given name, age'''
+        try:
+            subject = self.getTestSubjectId(name, age)
+            if subject is not None:
+                return subject
             with sqlite3.connect(self.database_path) as conn:
                 cur = conn.cursor()
                 cur.execute('''
@@ -86,7 +90,7 @@ class Manager():
                 ) 
                 VALUES (?, ?, ?)
                 ''', (name, age, gender))
-                return True
+                return self.getTestSubjectId(name, age)
         except sqlite3.Error as e:
             return e
 
@@ -189,10 +193,87 @@ class Manager():
                 return True
         except sqlite3.Error as e:
             return e
+    
+    def getTestSubjectId(self, name:str, age:int):
+        '''Get the id of the test subject with the given name and age'''
+        try:
+            with sqlite3.connect(self.database_path) as conn:
+                cur = conn.cursor()
+                cur.execute('''
+                SELECT id FROM test_subjects WHERE name = ? AND age = ?
+                ''', (name, age))
+                fetch_result = cur.fetchone()
+                if fetch_result is not None:
+                    self.lastSubjectId = fetch_result[0]
+                return self.lastSubjectId
+        except sqlite3.Error as e:
+            return e
+        
+    def getTestSubject(self, test_subject_id:int):
+        '''Get the test subject with the given id'''
+        try:
+            with sqlite3.connect(self.database_path) as conn:
+                cur = conn.cursor()
+                cur.execute('''
+                SELECT * FROM test_subjects WHERE id = ?
+                ''', (test_subject_id,))
+                return cur.fetchone()
+        except sqlite3.Error as e:
+            return e
+    
+    def getPoggendorffResults(self, test_subject_id:int):
+        '''Get the Poggendorff illusion results of the test subject with the given id'''
+        try:
+            with sqlite3.connect(self.database_path) as conn:
+                cur = conn.cursor()
+                cur.execute('''
+                SELECT * FROM poggendorff_results WHERE test_subject = ?
+                ''', (test_subject_id,))
+                return cur.fetchall()
+        except sqlite3.Error as e:
+            return e
+    
+    def getMullerLyerResults(self, test_subject_id:int):
+        '''Get the Müller-Lyer illusion results of the test subject with the given id'''
+        try:
+            with sqlite3.connect(self.database_path) as conn:
+                cur = conn.cursor()
+                cur.execute('''
+                SELECT * FROM muller_lyer_results WHERE test_subject = ?
+                ''', (test_subject_id,))
+                return cur.fetchall()
+        except sqlite3.Error as e:
+            return e
+    
+    def getVertHorzResults(self, test_subject_id:int):
+        '''Get the Vertical-horizontal illusion results of the test subject with the given id'''
+        try:
+            with sqlite3.connect(self.database_path) as conn:
+                cur = conn.cursor()
+                cur.execute('''
+                SELECT * FROM vert_horz_results WHERE test_subject = ?
+                ''', (test_subject_id,))
+                return cur.fetchall()
+        except sqlite3.Error as e:
+            return e
 
 if __name__ == "__main__":
     manager = Manager()
-    manager.saveTestSubject('ADdsada', 12, 'ThermoNuclearMissile')
-    print(manager.savePoggendorffResult(1, 12.0, 3, 4, 12, 4))
-    print(manager.saveMullerLyerResult(2, 3, 4.4, 5.4, 13))
-    print(manager.saveVertHorzResult(1, 32, 42, 5, 52, 3))
+    test_subject_name = 'John Doe'
+    test_subject_age = 25
+
+    print(manager.saveTestSubject(test_subject_name, test_subject_age, 'ThermoNuclearMissile'))
+
+    test_subject_id = manager.getTestSubjectId(test_subject_name, test_subject_age)
+    print(test_subject_id)
+    print(manager.getTestSubject(test_subject_id))
+
+    print(manager.savePoggendorffResult(test_subject_id, 12.0, 3, 4, 12, 4))
+    print(manager.saveMullerLyerResult(test_subject_id, 3, 4.4, 5.4, 13))
+    print(manager.saveVertHorzResult(test_subject_id, 32, 42, 5, 52, 3))
+
+    print(manager.getPoggendorffResults(test_subject_id))
+    print(manager.getMullerLyerResults(test_subject_id))
+    print(manager.getVertHorzResults(test_subject_id))
+
+
