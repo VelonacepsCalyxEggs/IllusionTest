@@ -178,14 +178,14 @@ class PoggendorffIllusion(tk.Frame):
             print(f"An error occurred while trying to save the data\n{e}")
     
         # Generate a new illusion
-        self.w_param = random.randint(1, 10) # width of the wall
+        self.w_param = random.randint(2, 10) # width of the wall
         self.h_param = random.randint(75, 150) # offset of second line
         self.alpha = random.randint(10, 80) # angle of the diagonal line
         self.beta = random.randint(0, 360) # angle of illusion itself
 
         # If user had reached 10 illusions, we redirect to the tests page.
         # On the tests page, we show the user a message box with info that he had completed this test. i.e prob verified by database query.
-        if self.illNum != 10:
+        if self.illNum != 9:
             self.draw_illusion()
 
             self.illNum = self.illNum + 1

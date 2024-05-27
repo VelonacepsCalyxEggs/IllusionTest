@@ -3,7 +3,7 @@ from tkinter import messagebox
 from PIL import Image, ImageTk
 from database import databaseManager
 from functions import exit
-from gui import poggendorphIllusion, mullerLyerIllusion
+from gui import poggendorphIllusion, mullerLyerIllusion, dashboard
 
 db = databaseManager.Manager()
 
@@ -100,6 +100,10 @@ class testsGUI(tk.Frame):
             for col in range(len(tests)):
                 self.grid_columnconfigure(col, weight=1)
 
+                # Label for the tests page, centered at the top
+        dashboard_button = tk.Button(self, text="Dashboard", command=lambda: switchPage(self=self, page=4, user_id=user_id))
+        dashboard_button.grid(row=5, columnspan=3)
+
         if redirected:
             messagebox.showinfo("Good work!", f"You have passed the {redFrom} test!" )
         
@@ -118,5 +122,10 @@ def switchPage(self, page, user_id: int):
         self.grid_forget()
         illusion_frame = mullerLyerIllusion.MullerLyerIllusion(user_id=user_id)
         illusion_frame.grid()
+    elif (page == 4):
+                # Hide the current frame
+        self.grid_forget()
+        dashboard_frame = dashboard.dashboardGUI(self.master, user_id=user_id)
+        dashboard_frame.grid()
     else:
         return
