@@ -1,8 +1,11 @@
 import tkinter as tk
+from tkinter import messagebox
+import time
 from gui import testsPage
 import random
 from utils.geometry_utils import Vector2D, Line
 from database import databaseManager
+from pygame import mixer  # Cross-platform solution
 
 class PoggendorffIllusion(tk.Frame):
     w_param = 10 # width of the wall
@@ -14,14 +17,21 @@ class PoggendorffIllusion(tk.Frame):
     subject_response = Vector2D(0, 0)
     user_id = None
 
+    mixer.init()
+    tick_sound = mixer.Sound('./resources/sounds/tick.wav')  # Load your sound file here
+
     def __init__(self, user_id: int):
         super().__init__()
-
         self.user_id = user_id
+
+        self.timer = tk.Label(self, font=('Helvetica', 48), text="15:00")
+        self.timer.grid(row=0, column=0, sticky='nsew')
+        self.countdown_running = True
+        self.countdown(900)
 
         # Create canvas
         self.canvas = tk.Canvas(self, width=512, height=512)
-        self.canvas.grid(row=0, column=0, sticky='nsew')
+        self.canvas.grid(row=1, column=0, sticky='nsew')
 
         # Configure the row and column weights where the canvas is placed
         self.grid_rowconfigure(0, weight=1)
@@ -75,7 +85,7 @@ class PoggendorffIllusion(tk.Frame):
         self.slider_alpha.grid()
 
         # Angle of the illusion
-        self.debug_lables_beta = tk.Label(self, text='Angle of the illusion NOT WORKING YET')
+        self.debug_lables_beta = tk.Label(self, text='Angle of the illusion !NOT WORKING YET')
         self.debug_lables_beta.grid()
         
         self.slider_beta = tk.Scale(self, from_=0, to=360, orient='horizontal', command=self.adjust_beta)
@@ -184,11 +194,32 @@ class PoggendorffIllusion(tk.Frame):
             self.switchPage()
 
     def switchPage(self):
+        self.stop_countdown()
         # Hide the current frame
         self.grid_forget()
         # Create and show a new frame or page using the grid manager
-        newPage = testsPage.testsGUI(self.master, self.user_id)
+        newPage = testsPage.testsGUI(self.master, self.user_id, True, "Poggendorf Illusion")
         newPage.grid(row=0, column=0, sticky="nsew")
         # Configure the master grid to center the new frame
         self.master.grid_rowconfigure(0, weight=1)
         self.master.grid_columnconfigure(0, weight=1)
+
+    def stop_countdown(self):
+        self.countdown_running = False
+
+    def countdown(self, time_remaining):
+        if time_remaining > 0 and self.countdown_running:
+            mins, secs = divmod(time_remaining, 60)
+            timeformat = '{:02d}:{:02d}'.format(mins, secs)
+            self.timer.configure(text=timeformat)
+            self.tick_sound.play()
+            self.after(1000, self.countdown, time_remaining-1)
+        elif not self.countdown_running:
+            self.timer.configure(text="Timer stopped")
+        else:
+            self.timer.configure(text="Time's up!")
+            self.times_up()
+
+    def times_up(self):
+        # This function will be called when the timer ends
+        messagebox.showinfo("Timer", "Time's up!")

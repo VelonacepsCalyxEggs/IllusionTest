@@ -74,7 +74,7 @@ def switchPage(self, user_id):
     # Hide the current frame
     self.grid_forget()
     # Create and show a new frame or page using the grid manager
-    newPage = testsPage.testsGUI(self.master, user_id)
+    newPage = testsPage.testsGUI(self.master, user_id, False, "Registration")
     newPage.grid(row=0, column=0, sticky="nsew")
     # Configure the master grid to center the new frame
     self.master.grid_rowconfigure(0, weight=1)
