@@ -20,11 +20,11 @@ class dashboardGUI(tk.Frame):
         self.clearTestResults()
 
         # Find the next available row index to start displaying the test results
-        # This should be one greater than the row index of the last widget before the test results
         start_row_index = self.chooseButton.grid_info()['row'] + 1
 
         # Fetch user test results from the database
         test = test.get()
+        testResults = []
         if test == "Poggendorph":
             testResults = db.getPoggendorffResults(user_id)
         elif test == "Muller":
@@ -32,39 +32,50 @@ class dashboardGUI(tk.Frame):
         elif test == "Vertical-Horizontal":
             testResults = db.getVertHorzResults(user_id)
         else:
-             return
+            return
         
         self.testResultWidgets = []
 
         # Create a label to display the test results header
         resultsLabel = tk.Label(self, text="Your Test Results")
-        resultsLabel.grid(row=start_row_index, columnspan=3)
+        resultsLabel.grid(row=start_row_index, columnspan=4)
         self.testResultWidgets.append(resultsLabel)
+
         # Display each test result in a separate row
         for i, result in enumerate(testResults, start=start_row_index + 1):
+
+            maxError = 256  # This should be the maximum error possible in your test
+
+            # Display the test-specific parameters
+            if test == "Poggendorph":
+                actualError = result[9]  # The absolute error in pixels from the database
+                tk.Label(self, text=f"Test {i}:").grid(row=i, column=0)
+                tk.Label(self, text=f"Width of Wall: {result[1]}").grid(row=i, column=1)  # Assuming 'w_param' is at index 1
+            elif test == "Muller":
+                actualError = result[6]  # The absolute error in pixels from the database
+                tk.Label(self, text=f"Test {i}:").grid(row=i, column=0)
+                tk.Label(self, text=f"Size of Circles: {result[1]}").grid(row=i, column=1)  # Assuming 'r_param' is at index 1
+                tk.Label(self, text=f"Distance Between Circles: {result[2]}").grid(row=i, column=2)  # Assuming 'd_param' is at index 2
+            elif test == "Vertical-Horizontal":
+                actualError = result[8]  # The absolute error in pixels from the database
+                tk.Label(self, text=f"Test {i}:").grid(row=i, column=0)
+                tk.Label(self, text=f"Length of Vertical Line: {result[1]}").grid(row=i, column=1)  # Assuming 'l_param' is at index 1
+                tk.Label(self, text=f"Height at Which Lines Aligned: {result[2]}").grid(row=i, column=2)  # Assuming 'h_param' is at index 2
+                        # Ensure actualError does not exceed maxError
+            actualError = min(actualError, maxError)
+
             # Calculate the accuracy percentage
-            # 'max_error' vrode is the maximum possible error in pixels
-            maxError = 100  
-            accuracyPercentage = max(0, ((maxError - result[9]) / maxError) * 100)  # result[9] is vrode 'absolute_error_pixels'
-
-            tk.Label(self, text=f"Test {i-1}:").grid(row=i, column=0)
-            tk.Label(self, text=f"Width of Wall: {result[1]}").grid(row=i, column=1)  # w_param
-
-            tk.Label(self, text=f"Accuracy: {accuracyPercentage:.2f}%").grid(row=i, column=3)  # Display accuracy
+            accuracyPercentage = (1 - (actualError / maxError)) * 100
+            # Display accuracy for all tests
+            tk.Label(self, text=f"Accuracy: {accuracyPercentage:.2f}%").grid(row=i, column=3)
 
             # Add the created widgets to the list for tracking
-            testLabel = tk.Label(self, text=f"Test {i-4}:")
-            testLabel.grid(row=i, column=0)
-            self.testResultWidgets.append(testLabel)
-
-            widthLabel = tk.Label(self, text=f"Width of Wall: {result[1]}")
-            widthLabel.grid(row=i, column=1)
-            self.testResultWidgets.append(widthLabel)
-
-            accuracyLabel = tk.Label(self, text=f"Accuracy: {accuracyPercentage:.2f}%")
-            accuracyLabel.grid(row=i, column=3)
-            self.testResultWidgets.append(accuracyLabel)
-
+            self.testResultWidgets.extend([
+                tk.Label(self, text=f"Test {i}:"),
+                tk.Label(self, text=f"Size of Circles: {result[1]}"),
+                tk.Label(self, text=f"Distance Between Circles: {result[2]}"),
+                tk.Label(self, text=f"Accuracy: {accuracyPercentage:.2f}%")
+            ])
 
         # Update the layout to ensure the new widgets are displayed correctly
         self.update_idletasks()

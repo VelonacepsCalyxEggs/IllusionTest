@@ -88,12 +88,11 @@ class testsGUI(tk.Frame):
             test_label.grid(row=3, column=col, padx=10, pady=10, sticky="ew")
 
         # Create buttons for the tests and center them
-        i = 0
+
         for col in range(len(tests)):
-            i += 1
             def create_button_callback(page):
-                return lambda: switchPage(self=self, page=page, user_id=user_id)
-            test_button = tk.Button(self, text="Start", command=create_button_callback(i))
+                return lambda: switchPage(self=self, test_name=page, user_id=user_id)
+            test_button = tk.Button(self, text="Start", command=create_button_callback(tests[col]))
             test_button.grid(row=4, column=col, padx=10, pady=13, sticky="ew")
 
             # Expand the columns so that they take up equal space
@@ -101,7 +100,7 @@ class testsGUI(tk.Frame):
                 self.grid_columnconfigure(col, weight=1)
 
                 # Label for the tests page, centered at the top
-        dashboard_button = tk.Button(self, text="Dashboard", command=lambda: switchPage(self=self, page=4, user_id=user_id))
+        dashboard_button = tk.Button(self, text="Dashboard", command=lambda: switchPage(self=self, test_name="Dashboard", user_id=user_id))
         dashboard_button.grid(row=5, columnspan=3)
 
         if redirected:
@@ -109,29 +108,43 @@ class testsGUI(tk.Frame):
         
 
 
-def switchPage(self, page, user_id: int):
+def switchPage(self, test_name, user_id: int):
+    # Mapping of test names to their respective page numbers
+    test_pages = {
+        "Poggendorff illusion": 1,
+        "Müller-Lyer illusion": 2,
+        "Vertical–horizontal illusion": 3,
+        "Dashboard": 4
+    }
+
+    # Update the mapping if tests are passed
+    pgres = db.getPoggendorffResults(user_id)
+    mulres = db.getMullerLyerResults(user_id)
+    vhres = db.getVertHorzResults(user_id)
+    if len(pgres) > 0:
+        del test_pages["Poggendorff illusion"]
+    if len(mulres) > 0:
+        del test_pages["Müller-Lyer illusion"]
+    if len(vhres) > 0:
+        del test_pages["Vertical–horizontal illusion"]
+
+    # Get the page number from the updated mapping
+    page = test_pages.get(test_name)
+
     # Create and show a new frame or page using the grid manager
-    print(page)
-    if (page == 1):
-        # Hide the current frame
+    if page is not None:
         self.grid_forget()
-        illusion_frame = poggendorphIllusion.PoggendorffIllusion(user_id=user_id)
-        illusion_frame.grid()
-    elif (page == 2):
-        # Hide the current frame
-        self.grid_forget()
-        illusion_frame = mullerLyerIllusion.MullerLyerIllusion(user_id=user_id)
-        illusion_frame.grid()
-    elif (page == 3):
-        # Hide the current frame
-        self.grid_forget()
-        illusion_frame = verticalHorizontalIllusion.verticalHorizontalIllusion(user_id=user_id)
-        illusion_frame.grid()
-    
-    elif (page == 4):
-                # Hide the current frame
-        self.grid_forget()
-        dashboard_frame = dashboard.dashboardGUI(self.master, user_id=user_id)
-        dashboard_frame.grid()
+        if page == 1:
+            illusion_frame = poggendorphIllusion.PoggendorffIllusion(user_id=user_id)
+            illusion_frame.grid()
+        elif page == 2:
+            illusion_frame = mullerLyerIllusion.MullerLyerIllusion(user_id=user_id)
+            illusion_frame.grid()
+        elif page == 3:
+            illusion_frame = verticalHorizontalIllusion.verticalHorizontalIllusion(user_id=user_id)
+            illusion_frame.grid()
+        elif page == 4:
+            dashboard_frame = dashboard.dashboardGUI(self.master, user_id=user_id)
+            dashboard_frame.grid()
     else:
-        return
+        messagebox.showerror("Error", "The selected test is not available.")

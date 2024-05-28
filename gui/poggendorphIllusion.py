@@ -5,6 +5,7 @@ import random
 from utils.geometry_utils import Vector2D, Line
 from database import databaseManager
 from pygame import mixer  # Cross-platform solution
+import json
 
 class PoggendorffIllusion(tk.Frame):
     w_param = 10 # width of the wall
@@ -26,6 +27,13 @@ class PoggendorffIllusion(tk.Frame):
 
     def __init__(self, user_id: int):
         super().__init__()
+                # check config
+        with open('./resources/config/config.json', 'r') as f:
+            # Read the file
+            file_content = f.read()
+            config = json.loads(file_content)
+            self.debug = config["Debug"]
+            print(self.debug)
         self.user_id = user_id
 
         self.timer = tk.Label(self, font=('Helvetica', 48), text="15:00")
@@ -43,7 +51,7 @@ class PoggendorffIllusion(tk.Frame):
 
         self.draw_illusion()
 
-        self.counter = tk.Label(self, text=self.illNum)
+        self.counter = tk.Label(self, text=f'Test number {self.illNum} out of 10')
         self.counter.grid()
 
         # Create slider to adjust the line position
@@ -53,48 +61,49 @@ class PoggendorffIllusion(tk.Frame):
         
         self.NextButton = tk.Button(self, text='Submit', command=self.submit_data)
         self.NextButton.grid()
-
-        # system buttons to redraw the illusion and sliders to adjast values
-        self.debug_lables_title = tk.Label(self, text='Debug controls')
-        self.debug_lables_title.grid()
-
-        # Create a button to redraw the illusion
-        self.redraw_button = tk.Button(self, text='Redraw', command=self.draw_illusion)
-        self.redraw_button.grid()
-
-        # Create sliders to adjust the parameters of the illusion
         
-        # Width of the wall
-        self.debug_lables_widht = tk.Label(self, text='Width of the wall')
-        self.debug_lables_widht.grid()
+        if self.debug == 'True':
+            # system buttons to redraw the illusion and sliders to adjust values
+            self.debug_lables_title = tk.Label(self, text='Debug controls')
+            self.debug_lables_title.grid()
+
+            # Create a button to redraw the illusion
+            self.redraw_button = tk.Button(self, text='Redraw', command=self.draw_illusion)
+            self.redraw_button.grid()
+
+            # Create sliders to adjust the parameters of the illusion
         
-        self.slider_w = tk.Scale(self, from_=10, to=100, orient='horizontal', command=self.adjust_w)
-        self.slider_w.set(self.w_param)
-        self.slider_w.grid()
+            # Width of the wall
+            self.debug_lables_widht = tk.Label(self, text='Width of the wall')
+            self.debug_lables_widht.grid()
+            
+            self.slider_w = tk.Scale(self, from_=10, to=100, orient='horizontal', command=self.adjust_w)
+            self.slider_w.set(self.w_param)
+            self.slider_w.grid()
 
-        # Height of secondary line
-        self.debug_lables_height = tk.Label(self, text='Height of secondary line')
-        self.debug_lables_height.grid()
+            # Height of secondary line
+            self.debug_lables_height = tk.Label(self, text='Height of secondary line')
+            self.debug_lables_height.grid()
 
-        self.slider_h = tk.Scale(self, from_=0, to=200, orient='horizontal', command=self.adjust_h)
-        self.slider_h.set(self.h_param)
-        self.slider_h.grid()
+            self.slider_h = tk.Scale(self, from_=0, to=200, orient='horizontal', command=self.adjust_h)
+            self.slider_h.set(self.h_param)
+            self.slider_h.grid()
 
-        # Angle of the diagonal line
-        self.debug_lables_alpha = tk.Label(self, text='Angle of the diagonal line')
-        self.debug_lables_alpha.grid()
+            # Angle of the diagonal line
+            self.debug_lables_alpha = tk.Label(self, text='Angle of the diagonal line')
+            self.debug_lables_alpha.grid()
 
-        self.slider_alpha = tk.Scale(self, from_=-90, to=90, orient='horizontal', command=self.adjust_alpha)
-        self.slider_alpha.set(self.alpha)
-        self.slider_alpha.grid()
+            self.slider_alpha = tk.Scale(self, from_=-90, to=90, orient='horizontal', command=self.adjust_alpha)
+            self.slider_alpha.set(self.alpha)
+            self.slider_alpha.grid()
 
-        # Angle of the illusion
-        self.debug_lables_beta = tk.Label(self, text='Angle of the illusion')
-        self.debug_lables_beta.grid()
-        
-        self.slider_beta = tk.Scale(self, from_=0, to=360, orient='horizontal', command=self.adjust_beta)
-        self.slider_beta.set(self.beta)
-        self.slider_beta.grid()
+            # Angle of the illusion
+            self.debug_lables_beta = tk.Label(self, text='Angle of the illusion')
+            self.debug_lables_beta.grid()
+            
+            self.slider_beta = tk.Scale(self, from_=0, to=360, orient='horizontal', command=self.adjust_beta)
+            self.slider_beta.set(self.beta)
+            self.slider_beta.grid()
 
     def draw_illusion(self, line_pos=0):
 
@@ -139,7 +148,12 @@ class PoggendorffIllusion(tk.Frame):
 
         # DEBUG Square at the intersection of the lines
         self.intersection = Line.calculate_intersection(Line, main_line, line2)
-        self.canvas.create_rectangle(self.intersection.x-1, self.intersection.y-1, self.intersection.x+1, self.intersection.y+1, fill='green')
+        # Create the rectangle and keep a reference to it
+        self.debug_square = self.canvas.create_rectangle(self.intersection.x-1, self.intersection.y-1, self.intersection.x+1, self.intersection.y+1, fill='green')
+
+        if self.debug != 'True':
+            # Make the rectangle invisible
+            self.canvas.itemconfig(self.debug_square, state='hidden')
 
         self.canvas.scale('all', 0, 0, 2, 2) # TODO: Look into how the elements are positioned, currently this is causing problems.
 

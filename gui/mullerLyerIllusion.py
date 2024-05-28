@@ -5,7 +5,7 @@ import random
 from utils.geometry_utils import Vector2D, Line, Circle
 from database import databaseManager
 from pygame import mixer  # Cross-platform solution
-
+import json
 class MullerLyerIllusion(tk.Frame):
     r_param = 10 # radius of the circles
     d_param = 20 # distance between the circles
@@ -30,6 +30,12 @@ class MullerLyerIllusion(tk.Frame):
 
     def __init__(self, user_id: int):
         super().__init__()
+        with open('./resources/config/config.json', 'r') as f:
+            # Read the file
+            file_content = f.read()
+            config = json.loads(file_content)
+            self.debug = config["Debug"]
+            print(self.debug)
         self.user_id = user_id
 
         self.timer = tk.Label(self, font=('Helvetica', 48), text="15:00")
@@ -58,39 +64,40 @@ class MullerLyerIllusion(tk.Frame):
         self.NextButton = tk.Button(self, text='Submit', command=self.submit_data)
         self.NextButton.grid()
 
-        # system buttons to redraw the illusion and sliders to adjast values
-        self.debug_lables_title = tk.Label(self, text='Debug controls')
-        self.debug_lables_title.grid()
+        if self.debug == 'True':
+            # system buttons to redraw the illusion and sliders to adjast values
+            self.debug_lables_title = tk.Label(self, text='Debug controls')
+            self.debug_lables_title.grid()
 
-        # Create a button to redraw the illusion
-        self.redraw_button = tk.Button(self, text='Redraw', command=self.draw_illusion)
-        self.redraw_button.grid()
+            # Create a button to redraw the illusion
+            self.redraw_button = tk.Button(self, text='Redraw', command=self.draw_illusion)
+            self.redraw_button.grid()
 
-        # Create sliders to adjust the parameters of the illusion
-        
-        # Radius of the circles
-        self.debug_lables_widht = tk.Label(self, text='Radius of the circle')
-        self.debug_lables_widht.grid()
-        
-        self.slider_r = tk.Scale(self, from_=2, to=25, orient='horizontal', command=self.adjust_r)
-        self.slider_r.set(self.r_param)
-        self.slider_r.grid()
+            # Create sliders to adjust the parameters of the illusion
+            
+            # Radius of the circles
+            self.debug_lables_widht = tk.Label(self, text='Radius of the circle')
+            self.debug_lables_widht.grid()
+            
+            self.slider_r = tk.Scale(self, from_=2, to=25, orient='horizontal', command=self.adjust_r)
+            self.slider_r.set(self.r_param)
+            self.slider_r.grid()
 
-        # Distance between the lines
-        self.debug_lables_height = tk.Label(self, text='Distance between the lines')
-        self.debug_lables_height.grid()
+            # Distance between the lines
+            self.debug_lables_height = tk.Label(self, text='Distance between the lines')
+            self.debug_lables_height.grid()
 
-        self.slider_d = tk.Scale(self, from_=10, to=150, orient='horizontal', command=self.adjust_d)
-        self.slider_d.set(self.d_param)
-        self.slider_d.grid()
+            self.slider_d = tk.Scale(self, from_=10, to=150, orient='horizontal', command=self.adjust_d)
+            self.slider_d.set(self.d_param)
+            self.slider_d.grid()
 
-        # Angle of the illusion
-        self.debug_lables_alpha = tk.Label(self, text='Angle of the illusion')
-        self.debug_lables_alpha.grid()
+            # Angle of the illusion
+            self.debug_lables_alpha = tk.Label(self, text='Angle of the illusion')
+            self.debug_lables_alpha.grid()
 
-        self.slider_alpha = tk.Scale(self, from_=0, to=360, orient='horizontal', command=self.adjust_alpha)
-        self.slider_alpha.set(self.alpha)
-        self.slider_alpha.grid()
+            self.slider_alpha = tk.Scale(self, from_=0, to=360, orient='horizontal', command=self.adjust_alpha)
+            self.slider_alpha.set(self.alpha)
+            self.slider_alpha.grid()
 
     def draw_illusion(self, circle_pos=0):
 
@@ -125,18 +132,21 @@ class MullerLyerIllusion(tk.Frame):
         
         #Debug lines and cercle
 
-        line1 = Line(Vector2D(first_circle_pos.x + self.r_param, first_circle_pos.y + self.r_param), Vector2D(1, 0), self.d_param)
-        line2 = Line(Vector2D(second_circle_pos.x + self.r_param, second_circle_pos.y + self.r_param), Vector2D(1, 0), self.d_param)
+        self.line1 = Line(Vector2D(first_circle_pos.x + self.r_param, first_circle_pos.y + self.r_param), Vector2D(1, 0), self.d_param)
+        self.line2 = Line(Vector2D(second_circle_pos.x + self.r_param, second_circle_pos.y + self.r_param), Vector2D(1, 0), self.d_param)
 
-        line1.rotate_around_point(self.alpha, ill_center)
-        line2.rotate_around_point(self.alpha, ill_center)
+        self.line1.rotate_around_point(self.alpha, ill_center)
+        self.line2.rotate_around_point(self.alpha, ill_center)
 
-        self.canvas.create_line(line1.org.x, line1.org.y, line1.secn.x, line1.secn.y, fill='green', width=1)
-        self.canvas.create_line(line2.org.x, line2.org.y, line2.secn.x, line2.secn.y, fill='black', width=1)
+        self.canvas.create_line(self.line1.org.x, self.line1.org.y, self.line1.secn.x, self.line1.secn.y, fill='green', width=1)
+        self.canvas.create_line(self.line2.org.x, self.line2.org.y, self.line2.secn.x, self.line2.secn.y, fill='black', width=1)
 
-        desired_circle = Circle(self.desired_point, 1)
-        desired_circle.rotate_around_point(self.alpha, ill_center)
-        desired_circle.draw(self.canvas, color='black', fill='black', width=1)
+        self.debug_square = Circle(self.desired_point, 1)
+        self.debug_square.rotate_around_point(self.alpha, ill_center)
+        self.debug_square.draw(self.canvas, color='white', fill='white', width=1) # ЭТА ХУЙНЯ НЕ УМИРАЕТ, ТЕПЕРЬ ОНА БЕЛАЯ!!
+        
+        if self.debug != 'True':
+            self.canvas.itemconfig(self.debug_square, state='hidden')
 
         self.canvas.scale('all', 0, 0, 2, 2) # TODO: Look into how the elements are positioned, currently this is causing problems.
 

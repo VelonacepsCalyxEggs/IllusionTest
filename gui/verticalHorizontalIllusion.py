@@ -5,7 +5,7 @@ import random
 from utils.geometry_utils import Vector2D, Line, Circle
 from database import databaseManager
 from pygame import mixer  # Cross-platform solution
-
+import json
 class verticalHorizontalIllusion(tk.Frame):
     l_param = 64 # length of the horizontal line
     h_param = 75 # height of the vertical lines
@@ -26,6 +26,13 @@ class verticalHorizontalIllusion(tk.Frame):
 
     def __init__(self, user_id: int):
         super().__init__()
+        with open('./resources/config/config.json', 'r') as f:
+            # Read the file
+            file_content = f.read()
+            config = json.loads(file_content)
+            self.debug = config["Debug"]
+            print(self.debug)
+
         self.user_id = user_id
 
         self.timer = tk.Label(self, font=('Helvetica', 48), text="15:00")
@@ -53,56 +60,56 @@ class verticalHorizontalIllusion(tk.Frame):
         
         self.NextButton = tk.Button(self, text='Submit', command=self.submit_data)
         self.NextButton.grid()
+        if self.debug == "True":
+            # system buttons to redraw the illusion and sliders to adjast values
+            self.debug_lables_title = tk.Label(self, text='Debug controls')
+            self.debug_lables_title.grid()
 
-        # system buttons to redraw the illusion and sliders to adjast values
-        self.debug_lables_title = tk.Label(self, text='Debug controls')
-        self.debug_lables_title.grid()
+            # Create a button to redraw the illusion
+            self.redraw_button = tk.Button(self, text='Redraw', command=self.draw_illusion)
+            self.redraw_button.grid()
 
-        # Create a button to redraw the illusion
-        self.redraw_button = tk.Button(self, text='Redraw', command=self.draw_illusion)
-        self.redraw_button.grid()
+            # Create sliders to adjust the parameters of the illusion
+            
+            # Length of the horizontal line
+            self.debug_lables_widht = tk.Label(self, text='Length of the horizontal line')
+            self.debug_lables_widht.grid()
+            
+            self.slider_r = tk.Scale(self, from_=1, to=128, orient='horizontal', command=self.adjust_l)
+            self.slider_r.set(self.l_param)
+            self.slider_r.grid()
 
-        # Create sliders to adjust the parameters of the illusion
-        
-        # Length of the horizontal line
-        self.debug_lables_widht = tk.Label(self, text='Length of the horizontal line')
-        self.debug_lables_widht.grid()
-        
-        self.slider_r = tk.Scale(self, from_=1, to=128, orient='horizontal', command=self.adjust_l)
-        self.slider_r.set(self.l_param)
-        self.slider_r.grid()
+            # Height of the vertical lines
+            self.debug_lables_height = tk.Label(self, text='Height of the vertical lines')
+            self.debug_lables_height.grid()
 
-        # Height of the vertical lines
-        self.debug_lables_height = tk.Label(self, text='Height of the vertical lines')
-        self.debug_lables_height.grid()
+            self.slider_d = tk.Scale(self, from_=128, to=1, orient='horizontal', command=self.adjust_h)
+            self.slider_d.set(self.h_param)
+            self.slider_d.grid()
 
-        self.slider_d = tk.Scale(self, from_=128, to=1, orient='horizontal', command=self.adjust_h)
-        self.slider_d.set(self.h_param)
-        self.slider_d.grid()
+            # Position of the vertical line
+            self.debug_lables_position = tk.Label(self, text='Position of the vertical line')
+            self.debug_lables_position.grid()
 
-        # Position of the vertical line
-        self.debug_lables_position = tk.Label(self, text='Position of the vertical line')
-        self.debug_lables_position.grid()
+            self.slider_position = tk.Scale(self, from_=-64, to=64, orient='horizontal', command=self.adjust_d)
+            self.slider_position.set(self.d_param)
+            self.slider_position.grid()
 
-        self.slider_position = tk.Scale(self, from_=-64, to=64, orient='horizontal', command=self.adjust_d)
-        self.slider_position.set(self.d_param)
-        self.slider_position.grid()
+            # Angle of the vertical line
+            self.debug_lables_alpha = tk.Label(self, text='Angle of the vertical line')
+            self.debug_lables_alpha.grid()
 
-        # Angle of the vertical line
-        self.debug_lables_alpha = tk.Label(self, text='Angle of the vertical line')
-        self.debug_lables_alpha.grid()
+            self.slider_alpha = tk.Scale(self, from_=-90, to=90, orient='horizontal', command=self.adjust_alpha)
+            self.slider_alpha.set(self.alpha)
+            self.slider_alpha.grid()
 
-        self.slider_alpha = tk.Scale(self, from_=-90, to=90, orient='horizontal', command=self.adjust_alpha)
-        self.slider_alpha.set(self.alpha)
-        self.slider_alpha.grid()
+            # Angle of the illusion
+            self.debug_lables_beta = tk.Label(self, text='Angle of the illusion')
+            self.debug_lables_beta.grid()
 
-        # Angle of the illusion
-        self.debug_lables_beta = tk.Label(self, text='Angle of the illusion')
-        self.debug_lables_beta.grid()
-
-        self.slider_beta = tk.Scale(self, from_=0, to=360, orient='horizontal', command=self.adjust_beta)
-        self.slider_beta.set(self.beta)
-        self.slider_beta.grid()
+            self.slider_beta = tk.Scale(self, from_=0, to=360, orient='horizontal', command=self.adjust_beta)
+            self.slider_beta.set(self.beta)
+            self.slider_beta.grid()
 
 
 
@@ -133,12 +140,16 @@ class verticalHorizontalIllusion(tk.Frame):
         vertical_line.draw(self.canvas, color=self.lines_colour[1], width=1)
 
         # Debug circle at desried point
-        circle = Circle(self.desired_point, 1)
-        circle.draw(self.canvas, color='green', width=1)
+        # Я не понимаю блядь почему сука они не прячуться
+        #self.circle = Circle(self.desired_point, 1)
+        #self.circle.draw(self.canvas, color='white', width=1)
 
-        center_circle = Circle(ill_center, 1)
-        center_circle.draw(self.canvas, color='orange', width=1)
-
+        #self.center_circle = Circle(ill_center, 1)
+        #self.center_circle.draw(self.canvas, color='white', width=1)
+        #if self.debug != "True":
+        #    self.canvas.itemconfig(self.circle, state='hidden')
+        #    self.canvas.itemconfig(self.center_circle, state='hidden')
+            
         self.canvas.scale('all', 0, 0, 2, 2) # TODO: Look into how the elements are positioned, currently this is causing problems.
 
     def adjust_alpha(self, value):

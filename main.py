@@ -1,11 +1,19 @@
 import tkinter as tk
 from functions import exit 
 from gui import registerPage
+import json
 class App(tk.Tk):
     def __init__(self):
         super().__init__()
 
         self.show_frame(registerPage.registerGUI)
+
+        # check config
+        with open('./resources/config/config.json', 'r') as f:
+            # Read the file
+            file_content = f.read()
+            config = json.loads(file_content)
+            self.debug = config["Debug"]
 
     def show_frame(self, context):
         frame = registerPage.registerGUI(self)
