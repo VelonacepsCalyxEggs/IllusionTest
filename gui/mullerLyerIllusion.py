@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import messagebox
 from gui import testsPage
 import random
-from utils.geometry_utils import Vector2D, Line, Circle
+from utils.geometry_utils import Vector2D, Line, Circle, pixel_to_mm
 from database import databaseManager
 from pygame import mixer  # Cross-platform solution
 import json
@@ -104,22 +104,22 @@ class MullerLyerIllusion(tk.Frame):
         # Clear the canvas
         self.canvas.delete('all')
 
-        ill_center = Vector2D(128, 128)
+        self.ill_center = Vector2D(128, 128)
         self.desired_point = Vector2D(3*self.r_param + 2*self.d_param, 128)
         
         # calculate the position of the circles
-        first_circle_pos = Vector2D(self.r_param, ill_center.y)
-        second_circle_pos = Vector2D(self.r_param + self.d_param, ill_center.y)
-        third_circle_pos = Vector2D(256 - self.r_param - 2 - circle_pos, ill_center.y)
+        first_circle_pos = Vector2D(self.r_param, self.ill_center.y)
+        second_circle_pos = Vector2D(self.r_param + self.d_param, self.ill_center.y)
+        third_circle_pos = Vector2D(256 - self.r_param - 2 - circle_pos, self.ill_center.y)
 
         # draw the circles
         first_circle = Circle(first_circle_pos, self.r_param)
         second_circle = Circle(second_circle_pos, self.r_param)
         third_circle = Circle(third_circle_pos, self.r_param)
 
-        first_circle.rotate_around_point(self.alpha, ill_center)
-        second_circle.rotate_around_point(self.alpha, ill_center)
-        third_circle.rotate_around_point(self.alpha, ill_center)
+        first_circle.rotate_around_point(self.alpha, self.ill_center)
+        second_circle.rotate_around_point(self.alpha, self.ill_center)
+        third_circle.rotate_around_point(self.alpha, self.ill_center)
 
         self.subject_response = third_circle_pos
 
@@ -135,14 +135,14 @@ class MullerLyerIllusion(tk.Frame):
         self.line1 = Line(Vector2D(first_circle_pos.x + self.r_param, first_circle_pos.y + self.r_param), Vector2D(1, 0), self.d_param)
         self.line2 = Line(Vector2D(second_circle_pos.x + self.r_param, second_circle_pos.y + self.r_param), Vector2D(1, 0), self.d_param)
 
-        self.line1.rotate_around_point(self.alpha, ill_center)
-        self.line2.rotate_around_point(self.alpha, ill_center)
+        self.line1.rotate_around_point(self.alpha, self.ill_center)
+        self.line2.rotate_around_point(self.alpha, self.ill_center)
 
         self.canvas.create_line(self.line1.org.x, self.line1.org.y, self.line1.secn.x, self.line1.secn.y, fill='green', width=1)
         self.canvas.create_line(self.line2.org.x, self.line2.org.y, self.line2.secn.x, self.line2.secn.y, fill='black', width=1)
 
         self.debug_square = Circle(self.desired_point, 1)
-        self.debug_square.rotate_around_point(self.alpha, ill_center)
+        self.debug_square.rotate_around_point(self.alpha, self.ill_center)
         self.debug_square.draw(self.canvas, color='white', fill='white', width=1) # ЭТА ХУЙНЯ НЕ УМИРАЕТ, ТЕПЕРЬ ОНА БЕЛАЯ!!
         
         if self.debug != 'True':
@@ -168,11 +168,18 @@ class MullerLyerIllusion(tk.Frame):
         print(f"Desired point: {self.desired_point}")
         print(f"Subject response: {self.subject_response}")
         print(f"Error in pixels: {self.desired_point - self.subject_response}")
-        absolute_error = (self.desired_point - self.subject_response).magnitude()
-        
-        #get dpi of the screen and calculate the absolute error in mm
         dpi = self.winfo_fpixels('1i')
-        absolute_error_mm = absolute_error / dpi * 25.4 * 2 # 2 is a magic number, it is the scale of the illusion
+        
+        # Calculate the error in pixels and mm
+        absolute_error = (self.desired_point - self.subject_response).magnitude()
+        max_error_pixel = (self.desired_point - Vector2D(256 - self.r_param - 2, self.ill_center.y)).magnitude()
+        
+        absolute_error_mm = pixel_to_mm(absolute_error, dpi, 2) # 2 is a magic number, it is the scale of the illusion
+        max_error_mm = pixel_to_mm(max_error_pixel, dpi, 2) # 2 is a magic number, it is the scale of the illusion
+
+        print(f"Max error in mm: {max_error_mm}")
+        print(f"Max error in pixels: {max_error_pixel}")
+
         print(f"Absolute error in mm: {absolute_error_mm}")
         print(f"Absolute error in pixels: {absolute_error}")
 
@@ -182,7 +189,8 @@ class MullerLyerIllusion(tk.Frame):
                 self.user_id, self.r_param, self.d_param, self.alpha,
                 self.desired_point.x, self.desired_point.y,
                 self.subject_response.x, self.subject_response.y,
-                absolute_error, absolute_error_mm)
+                absolute_error, absolute_error_mm,
+                max_error_pixel, max_error_mm)
             
         except Exception as e:
             print(f"An error occurred while trying to save the data\n{e}")

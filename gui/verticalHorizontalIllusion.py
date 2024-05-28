@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import messagebox
 from gui import testsPage
 import random
-from utils.geometry_utils import Vector2D, Line, Circle
+from utils.geometry_utils import Vector2D, Line, Circle, pixel_to_mm
 from database import databaseManager
 from pygame import mixer  # Cross-platform solution
 import json
@@ -117,27 +117,27 @@ class verticalHorizontalIllusion(tk.Frame):
         self.canvas.delete('all')
 
         # Calculate the position of the lines
-        ill_center = Vector2D(128, 128)
+        self.ill_center = Vector2D(128, 128)
 
 
-        self.desired_point = Vector2D(ill_center.x, self.h_param)
+        self.desired_point = Vector2D(self.ill_center.x, self.h_param)
 
-        horizontal_line = Line(Vector2D(ill_center.x - self.l_param/2, ill_center.y), Vector2D(1, 0), self.l_param)
-        vertical_line = Line(Vector2D(ill_center.x + self.d_param, ill_center.y), Vector2D(0, -1), length)
+        horizontal_line = Line(Vector2D(self.ill_center.x - self.l_param/2, self.ill_center.y), Vector2D(1, 0), self.l_param)
+        self.vertical_line = Line(Vector2D(self.ill_center.x + self.d_param, self.ill_center.y), Vector2D(0, -1), length)
 
-        vertical_line.rotate_around_point(self.alpha, Vector2D(ill_center.x + self.d_param, ill_center.y))
+        self.vertical_line.rotate_around_point(self.alpha, Vector2D(self.ill_center.x + self.d_param, self.ill_center.y))
 
-        horizontal_line.rotate_around_point(self.beta, ill_center)
-        vertical_line.rotate_around_point(self.beta, ill_center)
+        horizontal_line.rotate_around_point(self.beta, self.ill_center)
+        self.vertical_line.rotate_around_point(self.beta, self.ill_center)
 
-        self.desired_point.rotate_around_point(self.alpha, Vector2D(ill_center.x + self.d_param, ill_center.y))
-        self.desired_point.rotate_around_point(self.beta, ill_center)
+        self.desired_point.rotate_around_point(self.alpha, Vector2D(self.ill_center.x + self.d_param, self.ill_center.y))
+        self.desired_point.rotate_around_point(self.beta, self.ill_center)
 
-        self.subject_response = vertical_line.secn
+        self.subject_response = self.vertical_line.secn
 
         # Draw the lines
         horizontal_line.draw(self.canvas, color=self.lines_colour[0], width=1)
-        vertical_line.draw(self.canvas, color=self.lines_colour[1], width=1)
+        self.vertical_line.draw(self.canvas, color=self.lines_colour[1], width=1)
 
         # Debug circle at desried point
         # Я не понимаю блядь почему сука они не прячуться
@@ -176,11 +176,18 @@ class verticalHorizontalIllusion(tk.Frame):
         print(f"Desired point: {self.desired_point}")
         print(f"Subject response: {self.subject_response}")
         print(f"Error in pixels: {self.desired_point - self.subject_response}")
-        absolute_error = (self.desired_point - self.subject_response).magnitude()
-        
-        #get dpi of the screen and calculate the absolute error in mm
         dpi = self.winfo_fpixels('1i')
-        absolute_error_mm = absolute_error / dpi * 25.4 * 2 # 2 is a magic number, it is the scale of the illusion
+        
+
+        absolute_error = (self.desired_point - self.subject_response).magnitude()
+        absolute_error_mm = pixel_to_mm(absolute_error, dpi, 2) # 2 is a magic number, it is the scale of the illusion
+        
+        max_error_pixel = (self.desired_point - self.vertical_line.org).magnitude()
+        max_error_mm = pixel_to_mm(max_error_pixel, dpi, 2) # 2 is a magic number, it is the scale of the illusion
+        
+        print(f"Max error in mm: {max_error_mm}")
+        print(f"Max error in pixels: {max_error_pixel}")
+
         print(f"Absolute error in mm: {absolute_error_mm}")
         print(f"Absolute error in pixels: {absolute_error}")
 
@@ -191,7 +198,7 @@ class verticalHorizontalIllusion(tk.Frame):
                 self.alpha, self.beta, self.desired_point.x, 
                 self.desired_point.y, self.subject_response.x, 
                 self.subject_response.y, absolute_error, 
-                absolute_error_mm)
+                absolute_error_mm, max_error_pixel, max_error_mm)
             
         except Exception as e:
             print(f"An error occurred while trying to save the data\n{e}")

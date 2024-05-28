@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import messagebox
 from gui import testsPage
 import random
-from utils.geometry_utils import Vector2D, Line
+from utils.geometry_utils import Vector2D, Line, pixel_to_mm
 from database import databaseManager
 from pygame import mixer  # Cross-platform solution
 import json
@@ -116,15 +116,15 @@ class PoggendorffIllusion(tk.Frame):
         line1 = Line(Vector2D(128, 0), Vector2D(0,1), 200)
         line1.swap_origin()
 
-        line2 = Line(Vector2D(128+self.w_param, 0), Vector2D(0,1), 200)
-        line2.swap_origin()
+        self.line2 = Line(Vector2D(128+self.w_param, 0), Vector2D(0,1), 200)
+        self.line2.swap_origin()
         
-        self.center = Vector2D((line1.org.x + line2.org.x)/2, line1.len/2)
+        self.center = Vector2D((line1.org.x + self.line2.org.x)/2, line1.len/2)
         line1.rotate_around_point(self.beta, self.center)
-        line2.rotate_around_point(self.beta, self.center)
+        self.line2.rotate_around_point(self.beta, self.center)
 
         line1.draw(self.canvas, color='black', width=1)
-        line2.draw(self.canvas, color='black', width=1)
+        self.line2.draw(self.canvas, color='black', width=1)
 
 
         # Diagonal line using the Line class
@@ -147,7 +147,7 @@ class PoggendorffIllusion(tk.Frame):
         self.continuous_line_obj = self.continuous_line.draw(self.canvas, color=self.line_colours[0], width=2)
 
         # DEBUG Square at the intersection of the lines
-        self.intersection = Line.calculate_intersection(Line, main_line, line2)
+        self.intersection = Line.calculate_intersection(Line, main_line, self.line2)
         # Create the rectangle and keep a reference to it
         self.debug_square = self.canvas.create_rectangle(self.intersection.x-1, self.intersection.y-1, self.intersection.x+1, self.intersection.y+1, fill='green')
 
@@ -179,10 +179,20 @@ class PoggendorffIllusion(tk.Frame):
         print(f"Subject response: {self.subject_response}")
         print(f"Error in pixels: {self.intersection - self.subject_response}")
         absolute_error = (self.intersection - self.subject_response).magnitude()
-
-        #get dpi of the screen and calculate the absolute error in mm
+        
         dpi = self.winfo_fpixels('1i')
-        absolute_error_mm = absolute_error / dpi * 25.4 * 2 # 2 is a magic number, it is the scale of the illusion
+
+        # calculate maximum possible error in pixels
+        possible_values = [self.line2.org - self.intersection, self.line2.secn - self.intersection]
+        max_error_pixel = possible_values[0].magnitude() if possible_values[1].magnitude() < possible_values[0].magnitude() else possible_values[1].magnitude()
+
+        # calculate the absolute error in mm
+        max_error_mm = pixel_to_mm(max_error_pixel, dpi, 2) # 2 is a magic number, it is the scale of the illusion
+        absolute_error_mm = pixel_to_mm(absolute_error, dpi, 2) # 2 is a magic number, it is the scale of the illusion
+        
+        print(f"Max error in mm: {max_error_mm}")
+        print(f"Max error in pixels: {max_error_pixel}")
+
         print(f"Absolute error in mm: {absolute_error_mm}")
         print(f"Absolute error in pixels: {absolute_error}")
 
@@ -192,7 +202,8 @@ class PoggendorffIllusion(tk.Frame):
                 self.user_id, self.w_param, self.h_param, self.alpha,
                 self.beta, self.intersection.x, self.intersection.y,
                 self.subject_response.x, self.subject_response.y,
-                absolute_error, absolute_error_mm)
+                absolute_error, absolute_error_mm, max_error_pixel,
+                max_error_mm)
             
         except Exception as e:
             print(f"An error occurred while trying to save the data\n{e}")

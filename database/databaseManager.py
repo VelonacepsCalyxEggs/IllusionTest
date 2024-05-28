@@ -44,7 +44,9 @@ class Manager():
                         subject_guess_x FLOAT NOT NULL,
                         subject_guess_y FLOAT NOT NULL,
                         absolute_error_pixels FLOAT NOT NULL,
-                        absolute_error_mm FLOAT NOT NULL               
+                        absolute_error_mm FLOAT NOT NULL,
+                        max_error_pixels FLOAT NOT NULL,
+                        max_error_mm FLOAT NOT NULL               
                     )
                 ''')
 
@@ -70,7 +72,9 @@ class Manager():
                         subject_guess_x FLOAT NOT NULL,
                         subject_guess_y FLOAT NOT NULL,
                         absolute_error_pixels FLOAT NOT NULL,
-                        absolute_error_mm FLOAT NOT NULL
+                        absolute_error_mm FLOAT NOT NULL,
+                        max_error_pixels FLOAT NOT NULL,
+                        max_error_mm FLOAT NOT NULL
                     )
                 ''')
 
@@ -100,7 +104,9 @@ class Manager():
                         subject_guess_x FLOAT NOT NULL,
                         subject_guess_y FLOAT NOT NULL,
                         absolute_error_pixels FLOAT NOT NULL,
-                        absolute_error_mm FLOAT NOT NULL
+                        absolute_error_mm FLOAT NOT NULL,
+                        max_error_pixels FLOAT NOT NULL,
+                        max_error_mm FLOAT NOT NULL
                     )
                 '''
                 )
@@ -132,7 +138,8 @@ class Manager():
                             beta_angle: float, intersection_x: float,
                             intersection_y: float, subject_guess_x: float,
                             subject_guess_y: float, absolute_error_pixels: float,
-                            absolute_error_mm: float):
+                            absolute_error_mm: float, max_error_pixels: float,
+                            max_error_mm: float):
         '''
         test_subject id of test subject\n
         w_param is width of wall\n
@@ -145,6 +152,8 @@ class Manager():
         subject_guess_y is y coordinate of subject guess\n
         absolute_error_pixels is absolute error in pixels\n
         absolute_error_mm is absolute error in mm\n
+        max_error_pixels is max error in pixels\n
+        max_error_mm is max error in mm\n
         '''
         try: 
             result = (
@@ -158,7 +167,9 @@ class Manager():
                 subject_guess_x,
                 subject_guess_y,
                 absolute_error_pixels,
-                absolute_error_mm
+                absolute_error_mm,
+                max_error_pixels,
+                max_error_mm
             )
             with sqlite3.connect(self.database_path) as conn:
                 cur = conn.cursor()
@@ -168,9 +179,10 @@ class Manager():
                     alpha_angle, beta_angle, intersection_x,
                     intersection_y, subject_guess_x,
                     subject_guess_y, absolute_error_pixels,
-                    absolute_error_mm
+                    absolute_error_mm, max_error_pixels,
+                    max_error_mm
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ''', result)
                 conn.commit()
                 return True
@@ -181,7 +193,8 @@ class Manager():
                             d_param: float, alpha_angle: float, 
                             desired_point_x: float, desired_point_y: float,
                             subject_guess_x: float, subject_guess_y: float,
-                            absolute_error_pixels: float, absolute_error_mm: float):
+                            absolute_error_pixels: float, absolute_error_mm: float,
+                            max_error_pixels: float, max_error_mm: float):
         '''
         test_subject id of test subject\n
         r_param is size of circles\n
@@ -204,6 +217,8 @@ class Manager():
                 subject_guess_y,
                 absolute_error_pixels,
                 absolute_error_mm,
+                max_error_pixels,
+                max_error_mm,
             )
             with sqlite3.connect(self.database_path) as conn:
                 cur = conn.cursor()
@@ -212,9 +227,10 @@ class Manager():
                     test_subject, r_param, d_param,
                     alpha_angle, desired_point_x, desired_point_y,
                     subject_guess_x, subject_guess_y,
-                    absolute_error_pixels, absolute_error_mm
+                    absolute_error_pixels, absolute_error_mm,
+                    max_error_pixels, max_error_mm
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ''', result)
                 conn.commit()
                 return True
@@ -226,7 +242,8 @@ class Manager():
                             beta_angle: float, desired_point_x: float,
                             desired_point_y: float, subject_guess_x: float,
                             subject_guess_y: float, absolute_error_pixels: float,
-                            absolute_error_mm: float):
+                            absolute_error_mm: float, max_error_pixels: float,
+                            max_error_mm: float):
         '''
         test_subject id of test subject\n
         l_param is length of vertical line\n
@@ -252,7 +269,9 @@ class Manager():
                 subject_guess_x,
                 subject_guess_y,
                 absolute_error_pixels,
-                absolute_error_mm
+                absolute_error_mm,
+                max_error_pixels,
+                max_error_mm,
             )
             with sqlite3.connect(self.database_path) as conn:
                 cur = conn.cursor()
@@ -262,9 +281,10 @@ class Manager():
                     d_param, alpha_angle, beta_angle,
                     desired_point_x, desired_point_y,
                     subject_guess_x, subject_guess_y,
-                    absolute_error_pixels, absolute_error_mm
+                    absolute_error_pixels, absolute_error_mm,
+                    max_error_pixels, max_error_mm
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ''', result)
                 conn.commit()
                 return True
@@ -345,9 +365,9 @@ if __name__ == "__main__":
     print(test_subject_id)
     print(manager.getTestSubject(test_subject_id))
 
-    print(manager.savePoggendorffResult(test_subject_id, 3, 4.4, 5.4, 13, 3, 4, 5, 6, 7, 8))
-    print(manager.saveMullerLyerResult(test_subject_id, 3, 4.4, 5.4, 13))
-    print(manager.saveVertHorzResult(test_subject_id, 32, 42, 5, 52, 3))
+    print(manager.savePoggendorffResult(test_subject_id, 3, 4.4, 5.4, 13, 3, 4, 5, 6, 7, 8, 3, 4))
+    print(manager.saveMullerLyerResult(test_subject_id, 3, 4.4, 5.4, 13, 3, 4, 5, 6, 7, 8, 3))
+    print(manager.saveVertHorzResult(test_subject_id, 32, 42, 5, 52, 3, 4, 5, 6, 7, 8, 3, 4, 3))
 
     print(manager.getPoggendorffResults(test_subject_id))
     print(manager.getMullerLyerResults(test_subject_id))

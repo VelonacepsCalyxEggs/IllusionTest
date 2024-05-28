@@ -1,5 +1,11 @@
 import math
 
+def pixel_to_mm(pixel, dpi, scale):
+    '''
+    converts pixel to mm
+    '''
+    return pixel / dpi * 25.4 * scale
+
 class Vector2D():
     '''
     this is a class for 2D vectors with x and y components and some basic operations
