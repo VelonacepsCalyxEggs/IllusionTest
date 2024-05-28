@@ -44,20 +44,23 @@ class dashboardGUI(tk.Frame):
         # Display each test result in a separate row
         for i, result in enumerate(testResults, start=start_row_index + 1):
 
-            maxError = 256  # This should be the maximum error possible in your test
+
 
             # Display the test-specific parameters
             if test == "Poggendorph":
+                maxError = result[11]  # This should be the maximum error possible 
                 actualError = result[9]  # The absolute error in pixels from the database
                 tk.Label(self, text=f"Test {i}:").grid(row=i, column=0)
                 tk.Label(self, text=f"Width of Wall: {result[1]}").grid(row=i, column=1)  # Assuming 'w_param' is at index 1
             elif test == "Muller":
-                actualError = result[6]  # The absolute error in pixels from the database
+                maxError = result[10]  # This should be the maximum error possible 
+                actualError = result[8]  # The absolute error in pixels from the database
                 tk.Label(self, text=f"Test {i}:").grid(row=i, column=0)
                 tk.Label(self, text=f"Size of Circles: {result[1]}").grid(row=i, column=1)  # Assuming 'r_param' is at index 1
                 tk.Label(self, text=f"Distance Between Circles: {result[2]}").grid(row=i, column=2)  # Assuming 'd_param' is at index 2
             elif test == "Vertical-Horizontal":
-                actualError = result[8]  # The absolute error in pixels from the database
+                maxError = result[12]  # This should be the maximum error possible 
+                actualError = result[10]  # The absolute error in pixels from the database
                 tk.Label(self, text=f"Test {i}:").grid(row=i, column=0)
                 tk.Label(self, text=f"Length of Vertical Line: {result[1]}").grid(row=i, column=1)  # Assuming 'l_param' is at index 1
                 tk.Label(self, text=f"Height at Which Lines Aligned: {result[2]}").grid(row=i, column=2)  # Assuming 'h_param' is at index 2
