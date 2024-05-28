@@ -125,4 +125,48 @@ class Line():
             x = (b2 * c1 - b1 * c2) / det
             y = (a1 * c2 - a2 * c1) / det
             return Vector2D(x, y)
+        
+    def draw(self, canvas, color='black', width=1):
+        '''
+        draws the line on the canvas
+        '''
+        return canvas.create_line(self.org.x, self.org.y, self.secn.x, self.secn.y, fill=color, width=width)
+
+class circle():
+    '''
+    this is a class describing a circle with center and radius
+    '''
+    def __init__(self, center: Vector2D, radius: float):
+        '''
+        center: center of the circle
+        radius: radius of the circle
+        '''
+        self.center = center
+        self.radius = radius
     
+    def __str__(self):
+        '''
+        returns a string representation of the circle
+        '''
+        return f"({self.center}, {self.radius})"
+    
+    def rotate_around_point(self, angle, point: Vector2D):
+        '''
+        rotates the circle around a given point by the given angle
+        '''
+        self.center = self.center - point
+        self.center = self.center.rotate(angle)
+        self.center = self.center + point
+    
+    def get_points_for_oval(self):
+        '''
+        returns 2 Vector2D of the points for the oval to be drawn on the canvas
+        '''
+        return Vector2D(self.center.x - self.radius, self.center.y - self.radius), Vector2D(self.center.x + self.radius, self.center.y + self.radius)
+    
+    def draw(self, canvas, color='black', fill='white', width=1):
+        '''
+        draws the circle on the canvas
+        '''
+        points = self.get_points_for_oval()
+        canvas.create_oval(points[0].x, points[0].y, points[1].x, points[1].y, outline=color, fill=fill, width=width)

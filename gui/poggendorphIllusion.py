@@ -1,6 +1,5 @@
 import tkinter as tk
 from tkinter import messagebox
-import time
 from gui import testsPage
 import random
 from utils.geometry_utils import Vector2D, Line
@@ -16,6 +15,11 @@ class PoggendorffIllusion(tk.Frame):
     intersection = Vector2D(0, 0)
     subject_response = Vector2D(0, 0)
     user_id = None
+
+    line_colours = [
+        'red',
+        'blue',
+    ]
 
     mixer.init()
     tick_sound = mixer.Sound('./resources/sounds/tick.wav')  # Load your sound file here
@@ -85,7 +89,7 @@ class PoggendorffIllusion(tk.Frame):
         self.slider_alpha.grid()
 
         # Angle of the illusion
-        self.debug_lables_beta = tk.Label(self, text='Angle of the illusion !NOT WORKING YET')
+        self.debug_lables_beta = tk.Label(self, text='Angle of the illusion')
         self.debug_lables_beta.grid()
         
         self.slider_beta = tk.Scale(self, from_=0, to=360, orient='horizontal', command=self.adjust_beta)
@@ -110,20 +114,20 @@ class PoggendorffIllusion(tk.Frame):
         line1.rotate_around_point(self.beta, self.center)
         line2.rotate_around_point(self.beta, self.center)
 
-        self.canvas.create_line(line2.org.x, line2.org.y, line2.secn.x, line2.secn.y, fill='black', width=1)
-        self.canvas.create_line(line1.org.x, line1.org.y, line1.secn.x, line1.secn.y, fill='black', width=1)
-        
+        line1.draw(self.canvas, color='black', width=1)
+        line2.draw(self.canvas, color='black', width=1)
+
 
         # Diagonal line using the Line class
         main_line = Line(Vector2D(128, 75), Vector2D(-1,0), 50)
         main_line.rotate(self.alpha)
         main_line.rotate_around_point(self.beta, self.center)
-        self.canvas.create_line(main_line.org.x, main_line.org.y, main_line.secn.x, main_line.secn.y, fill='red', width=2)
+        main_line.draw(self.canvas, color=self.line_colours[0], width=2)
 
         addional_line = Line(Vector2D(128+self.w_param, self.h_param), Vector2D(1,0), 50)
         addional_line.rotate(self.alpha)
         addional_line.rotate_around_point(self.beta, self.center)
-        self.canvas.create_line(addional_line.org.x, addional_line.org.y, addional_line.secn.x, addional_line.secn.y, fill='blue', width=2)
+        addional_line.draw(self.canvas, color=self.line_colours[1], width=2)
 
         # Continuous line with the same angle as the diagonal line using the Line class
         self.continuous_line = Line(Vector2D(128+self.w_param, 0 + line_pos), Vector2D(1,0), 50)
@@ -131,11 +135,9 @@ class PoggendorffIllusion(tk.Frame):
         self.continuous_line.rotate_around_point(self.beta, self.center)
         self.subject_response = self.continuous_line.org
         
-        self.continuous_line_obj = self.canvas.create_line(self.continuous_line.org.x, self.continuous_line.org.y, 
-                                                       self.continuous_line.secn.x, self.continuous_line.secn.y, 
-                                                       fill='red', width=2)
+        self.continuous_line_obj = self.continuous_line.draw(self.canvas, color=self.line_colours[0], width=2)
 
-        #Square at the intersection of the lines
+        # DEBUG Square at the intersection of the lines
         self.intersection = Line.calculate_intersection(Line, main_line, line2)
         self.canvas.create_rectangle(self.intersection.x-1, self.intersection.y-1, self.intersection.x+1, self.intersection.y+1, fill='green')
 
@@ -163,6 +165,11 @@ class PoggendorffIllusion(tk.Frame):
         print(f"Subject response: {self.subject_response}")
         print(f"Error in pixels: {self.intersection - self.subject_response}")
         absolute_error = (self.intersection - self.subject_response).magnitude()
+
+        #get dpi of the screen and calculate the absolute error in mm
+        dpi = self.winfo_fpixels('1i')
+        absolute_error_mm = absolute_error / dpi * 25.4 * 2 # 2 is a magic number, it is the scale of the illusion
+        print(f"Absolute error in mm: {absolute_error_mm}")
         print(f"Absolute error in pixels: {absolute_error}")
 
         try:
@@ -171,8 +178,7 @@ class PoggendorffIllusion(tk.Frame):
                 self.user_id, self.w_param, self.h_param, self.alpha,
                 self.beta, self.intersection.x, self.intersection.y,
                 self.subject_response.x, self.subject_response.y,
-                absolute_error,
-                absolute_error)
+                absolute_error, absolute_error_mm)
             
         except Exception as e:
             print(f"An error occurred while trying to save the data\n{e}")

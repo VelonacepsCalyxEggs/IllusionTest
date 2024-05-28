@@ -26,6 +26,12 @@ class Manager():
                 #h_subject_guess is height at which subject aligned line
                 #alpha_angle is angle of line rotation
                 #beta_angle is angle of illusion rotation
+                #intersection_x is x coordinate of intersection
+                #intersection_y is y coordinate of intersection
+                #subject_guess_x is x coordinate of subject guess
+                #subject_guess_y is y coordinate of subject guess
+                #absolute_error_pixels is absolute error in pixels
+                #absolute_error_mm is absolute error in mm
                 cur.execute('''
                     CREATE TABLE IF NOT EXISTS poggendorff_results (
                         test_subject,
@@ -44,17 +50,27 @@ class Manager():
 
                 #Müller-Lyer illusion results table
                 #test_subject id of test subject
-                #s_param is size of circles
+                #r_param is size of circles
                 #d_param is distance between circles
-                #d_subject_guess is length at which the subject aligns the circle
                 #alpha_angle is angle of illusion rotation
+                #desired_point_x is x coordinate of desired point
+                #desired_point_y is y coordinate of desired point
+                #subject_guess_x is x coordinate of subject guess
+                #subject_guess_y is y coordinate of subject guess
+                #absolute_error_pixels is absolute error in pixels
+                #absolute_error_mm is absolute error in mm
                 cur.execute('''
                     CREATE TABLE IF NOT EXISTS muller_lyer_results (
                         test_subject,
-                        s_param FLOAT NOT NULL,
+                        r_param FLOAT NOT NULL,
                         d_param FLOAT NOT NULL,
-                        d_subject_guess FLOAT NOT NULL,
-                        alpha_angle FLOAT NOT NULL
+                        alpha_angle FLOAT NOT NULL,
+                        desired_point_x FLOAT NOT NULL,
+                        desired_point_y FLOAT NOT NULL,
+                        subject_guess_x FLOAT NOT NULL,
+                        subject_guess_y FLOAT NOT NULL,
+                        absolute_error_pixels FLOAT NOT NULL,
+                        absolute_error_mm FLOAT NOT NULL
                     )
                 ''')
 
@@ -149,32 +165,44 @@ class Manager():
         except sqlite3.Error as e:
             return e
         
-    def saveMullerLyerResult(self, test_subject_id: int, s_param: float, 
-                            d_param: float, d_subject_guess: float, 
-                            alpha_angle: float):
+    def saveMullerLyerResult(self, test_subject_id: int, r_param: float,
+                            d_param: float, alpha_angle: float, 
+                            desired_point_x: float, desired_point_y: float,
+                            subject_guess_x: float, subject_guess_y: float,
+                            absolute_error_pixels: float, absolute_error_mm: float):
         '''
         test_subject id of test subject\n
-        s_param is size of circles\n
+        r_param is size of circles\n
         d_param is distance between circles\n
-        d_subject_guess is length at which the subject aligns the circle\n
         alpha_angle is angle of illusion rotation\n
+        desired_point_x/y is cord of desired point\n
+        subject_guess_x/y is cord at which the subject aligns the circle\n
+        absolute_error_pixels is absolute error in pixels\n
+        absolute_error_mm is absolute error in mm\n
         '''
         try:
             result = (
                 test_subject_id,
-                s_param,
+                r_param,
                 d_param,
-                d_subject_guess,
-                alpha_angle
+                alpha_angle,
+                desired_point_x,
+                desired_point_y,
+                subject_guess_x,
+                subject_guess_y,
+                absolute_error_pixels,
+                absolute_error_mm,
             )
             with sqlite3.connect(self.database_path) as conn:
                 cur = conn.cursor()
                 cur.execute('''
                 INSERT INTO muller_lyer_results (
-                    test_subject, s_param, d_param,
-                    d_subject_guess, alpha_angle
+                    test_subject, r_param, d_param,
+                    alpha_angle, desired_point_x, desired_point_y,
+                    subject_guess_x, subject_guess_y,
+                    absolute_error_pixels, absolute_error_mm
                 )
-                VALUES (?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ''', result)
                 conn.commit()
                 return True
