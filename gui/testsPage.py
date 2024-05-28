@@ -3,7 +3,7 @@ from tkinter import messagebox
 from PIL import Image, ImageTk
 from database import databaseManager
 from functions import exit
-from gui import poggendorphIllusion, mullerLyerIllusion, dashboard
+from gui import poggendorphIllusion, mullerLyerIllusion, verticalHorizontalIllusion, dashboard
 
 db = databaseManager.Manager()
 
@@ -122,6 +122,12 @@ def switchPage(self, page, user_id: int):
         self.grid_forget()
         illusion_frame = mullerLyerIllusion.MullerLyerIllusion(user_id=user_id)
         illusion_frame.grid()
+    elif (page == 3):
+        # Hide the current frame
+        self.grid_forget()
+        illusion_frame = verticalHorizontalIllusion.verticalHorizontalIllusion(user_id=user_id)
+        illusion_frame.grid()
+    
     elif (page == 4):
                 # Hide the current frame
         self.grid_forget()

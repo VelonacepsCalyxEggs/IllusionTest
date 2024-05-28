@@ -6,23 +6,19 @@ from utils.geometry_utils import Vector2D, Line, Circle
 from database import databaseManager
 from pygame import mixer  # Cross-platform solution
 
-class MullerLyerIllusion(tk.Frame):
-    r_param = 10 # radius of the circles
-    d_param = 20 # distance between the circles
-    alpha = 0 # angle of the illusion
+class verticalHorizontalIllusion(tk.Frame):
+    l_param = 64 # length of the horizontal line
+    h_param = 75 # height of the vertical lines
+    d_param = 0 # position of the vertical line
+    alpha = 0 # angle of the vertical line
+    beta = 0 # angle of the illusion
     illNum = 0 # number of the generated illusion
-    desired_point = Vector2D(4*r_param + 2*d_param, 128)
+    desired_point = Vector2D(0,0)
     subject_response = Vector2D(0, 0)
     user_id = None
-    circles_fill = [
+    lines_colour = [
         'blue',
-        'blue',
-        'red',   
-    ]
-    circles_outline = [
-        'black',
-        'black',
-        'black',
+        'red',
     ]
 
     mixer.init()
@@ -51,8 +47,8 @@ class MullerLyerIllusion(tk.Frame):
         self.counter.grid()
 
         # Create slider to adjust the circle position
-        self.slider = tk.Scale(self, from_=256 - self.d_param, to=0, orient='horizontal', command=self.adjust_circle)
-        self.slider.set(70)
+        self.slider = tk.Scale(self, from_=0, to=128, orient='horizontal', command=self.adjust_line)
+        self.slider.set(35)
         self.slider.grid()
         
         self.NextButton = tk.Button(self, text='Submit', command=self.submit_data)
@@ -68,88 +64,99 @@ class MullerLyerIllusion(tk.Frame):
 
         # Create sliders to adjust the parameters of the illusion
         
-        # Radius of the circles
-        self.debug_lables_widht = tk.Label(self, text='Radius of the circle')
+        # Length of the horizontal line
+        self.debug_lables_widht = tk.Label(self, text='Length of the horizontal line')
         self.debug_lables_widht.grid()
         
-        self.slider_r = tk.Scale(self, from_=2, to=25, orient='horizontal', command=self.adjust_r)
-        self.slider_r.set(self.r_param)
+        self.slider_r = tk.Scale(self, from_=1, to=128, orient='horizontal', command=self.adjust_l)
+        self.slider_r.set(self.l_param)
         self.slider_r.grid()
 
-        # Distance between the lines
-        self.debug_lables_height = tk.Label(self, text='Distance between the lines')
+        # Height of the vertical lines
+        self.debug_lables_height = tk.Label(self, text='Height of the vertical lines')
         self.debug_lables_height.grid()
 
-        self.slider_d = tk.Scale(self, from_=10, to=150, orient='horizontal', command=self.adjust_d)
-        self.slider_d.set(self.d_param)
+        self.slider_d = tk.Scale(self, from_=128, to=1, orient='horizontal', command=self.adjust_h)
+        self.slider_d.set(self.h_param)
         self.slider_d.grid()
 
-        # Angle of the illusion
-        self.debug_lables_alpha = tk.Label(self, text='Angle of the illusion')
+        # Position of the vertical line
+        self.debug_lables_position = tk.Label(self, text='Position of the vertical line')
+        self.debug_lables_position.grid()
+
+        self.slider_position = tk.Scale(self, from_=-64, to=64, orient='horizontal', command=self.adjust_d)
+        self.slider_position.set(self.d_param)
+        self.slider_position.grid()
+
+        # Angle of the vertical line
+        self.debug_lables_alpha = tk.Label(self, text='Angle of the vertical line')
         self.debug_lables_alpha.grid()
 
-        self.slider_alpha = tk.Scale(self, from_=0, to=360, orient='horizontal', command=self.adjust_alpha)
+        self.slider_alpha = tk.Scale(self, from_=-90, to=90, orient='horizontal', command=self.adjust_alpha)
         self.slider_alpha.set(self.alpha)
         self.slider_alpha.grid()
 
-    def draw_illusion(self, circle_pos=0):
+        # Angle of the illusion
+        self.debug_lables_beta = tk.Label(self, text='Angle of the illusion')
+        self.debug_lables_beta.grid()
 
-        # Clear the canvas
+        self.slider_beta = tk.Scale(self, from_=0, to=360, orient='horizontal', command=self.adjust_beta)
+        self.slider_beta.set(self.beta)
+        self.slider_beta.grid()
+
+
+
+    def draw_illusion(self, length=35):
         self.canvas.delete('all')
 
+        # Calculate the position of the lines
         ill_center = Vector2D(128, 128)
-        self.desired_point = Vector2D(3*self.r_param + 2*self.d_param, 128)
-        
-        # calculate the position of the circles
-        first_circle_pos = Vector2D(self.r_param, ill_center.y)
-        second_circle_pos = Vector2D(self.r_param + self.d_param, ill_center.y)
-        third_circle_pos = Vector2D(256 - self.r_param - 2 - circle_pos, ill_center.y)
 
-        # draw the circles
-        first_circle = Circle(first_circle_pos, self.r_param)
-        second_circle = Circle(second_circle_pos, self.r_param)
-        third_circle = Circle(third_circle_pos, self.r_param)
 
-        first_circle.rotate_around_point(self.alpha, ill_center)
-        second_circle.rotate_around_point(self.alpha, ill_center)
-        third_circle.rotate_around_point(self.alpha, ill_center)
+        self.desired_point = Vector2D(ill_center.x, self.h_param)
 
-        self.subject_response = third_circle_pos
+        horizontal_line = Line(Vector2D(ill_center.x - self.l_param/2, ill_center.y), Vector2D(1, 0), self.l_param)
+        vertical_line = Line(Vector2D(ill_center.x + self.d_param, ill_center.y), Vector2D(0, -1), length)
 
-        first_circle.draw(self.canvas, color=self.circles_outline[0],
-                          fill=self.circles_fill[0], width=1)
-        second_circle.draw(self.canvas, color=self.circles_outline[1],
-                           fill=self.circles_fill[1], width=1)
-        third_circle.draw(self.canvas, color=self.circles_outline[2],
-                          fill=self.circles_fill[2], width=1)
-        
-        #Debug lines and cercle
+        vertical_line.rotate_around_point(self.alpha, Vector2D(ill_center.x + self.d_param, ill_center.y))
 
-        line1 = Line(Vector2D(first_circle_pos.x + self.r_param, first_circle_pos.y + self.r_param), Vector2D(1, 0), self.d_param)
-        line2 = Line(Vector2D(second_circle_pos.x + self.r_param, second_circle_pos.y + self.r_param), Vector2D(1, 0), self.d_param)
+        horizontal_line.rotate_around_point(self.beta, ill_center)
+        vertical_line.rotate_around_point(self.beta, ill_center)
 
-        line1.rotate_around_point(self.alpha, ill_center)
-        line2.rotate_around_point(self.alpha, ill_center)
+        self.desired_point.rotate_around_point(self.alpha, Vector2D(ill_center.x + self.d_param, ill_center.y))
+        self.desired_point.rotate_around_point(self.beta, ill_center)
 
-        self.canvas.create_line(line1.org.x, line1.org.y, line1.secn.x, line1.secn.y, fill='green', width=1)
-        self.canvas.create_line(line2.org.x, line2.org.y, line2.secn.x, line2.secn.y, fill='black', width=1)
+        self.subject_response = vertical_line.secn
 
-        desired_circle = Circle(self.desired_point, 1)
-        desired_circle.rotate_around_point(self.alpha, ill_center)
-        desired_circle.draw(self.canvas, color='black', fill='black', width=1)
+        # Draw the lines
+        horizontal_line.draw(self.canvas, color=self.lines_colour[0], width=1)
+        vertical_line.draw(self.canvas, color=self.lines_colour[1], width=1)
+
+        # Debug circle at desried point
+        circle = Circle(self.desired_point, 1)
+        circle.draw(self.canvas, color='green', width=1)
+
+        center_circle = Circle(ill_center, 1)
+        center_circle.draw(self.canvas, color='orange', width=1)
 
         self.canvas.scale('all', 0, 0, 2, 2) # TODO: Look into how the elements are positioned, currently this is causing problems.
 
     def adjust_alpha(self, value):
         self.alpha = int(value)
+
+    def adjust_beta(self, value):
+        self.beta = int(value)
+    
+    def adjust_h(self, value):
+        self.h_param = int(value)
     
     def adjust_d(self, value):
         self.d_param = int(value)
-    
-    def adjust_r(self, value):
-        self.r_param = int(value)
 
-    def adjust_circle(self, value):          
+    def adjust_l(self, value):
+        self.l_param = int(value)
+
+    def adjust_line(self, value):          
         self.draw_illusion(int(value))
 
     def submit_data(self):
@@ -168,19 +175,21 @@ class MullerLyerIllusion(tk.Frame):
 
         try:
             db = databaseManager.Manager()
-            db.saveMullerLyerResult(
-                self.user_id, self.r_param, self.d_param, self.alpha,
-                self.desired_point.x, self.desired_point.y,
-                self.subject_response.x, self.subject_response.y,
-                absolute_error, absolute_error_mm)
+            db.saveVertHorzResult(
+                self.user_id, self.l_param, self.h_param, self.d_param,
+                self.alpha, self.beta, self.desired_point.x, 
+                self.desired_point.y, self.subject_response.x, 
+                self.subject_response.y, absolute_error, 
+                absolute_error_mm)
             
         except Exception as e:
             print(f"An error occurred while trying to save the data\n{e}")
     
         # Generate a new illusion
-        self.r_param = random.randint(2, 25) # width of the wall
-        self.d_param = random.randint(10, 100) # offset of second line
-        self.alpha = random.randint(0, 360) # angle of the illusion
+        self.h_param = random.randint(10, 128) # height of the vertical lines
+        self.l_param = random.randint(10, 128) # length of the horizontal line
+        self.alpha = random.randint(-90, 90) # angle of the vertical line
+        self.beta = random.randint(0, 360)
 
         # If user had reached 10 illusions, we redirect to the tests page.
         # On the tests page, we show the user a message box with info that he had completed this test. i.e prob verified by database query.

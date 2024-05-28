@@ -45,6 +45,16 @@ class Vector2D():
         y = self.x * math.sin(angle) + self.y * math.cos(angle)
         return Vector2D(x, y)
     
+    def rotate_around_point(self, angle, point):
+        '''
+        rotates the vector around a given point by the given angle
+        '''
+        self.x -= point.x
+        self.y -= point.y
+        self.x, self.y = self.rotate(angle).x, self.rotate(angle).y
+        self.x += point.x
+        self.y += point.y
+    
     def magnitude(self):
         '''
         returns the magnitude of the vector
@@ -132,7 +142,7 @@ class Line():
         '''
         return canvas.create_line(self.org.x, self.org.y, self.secn.x, self.secn.y, fill=color, width=width)
 
-class circle():
+class Circle():
     '''
     this is a class describing a circle with center and radius
     '''

@@ -76,19 +76,31 @@ class Manager():
 
                 #Vertical–horizontal illusion results table
                 #test_subject id of test subject
-                #h_param is length of vertical line
-                #h_subject_guess is length at which the subject aligns the vertical line
-                #d_param is horizontal offset of vertical
-                #beta_angle is angle of vertical line
-                #alpha_angle is angle of illusion rotation
+                #l_param is length of vertical line
+                #h_param is height at which lines aligned
+                #d_param is offset from center
+                #alpha_angle is angle of vertical line rotation
+                #beta_angle is angle of illusion rotation
+                #desired_point_x is x coordinate of desired point
+                #desired_point_y is y coordinate of desired point
+                #subject_guess_x is x coordinate of subject guess
+                #subject_guess_y is y coordinate of subject guess
+                #absolute_error_pixels is absolute error in pixels
+                #absolute_error_mm is absolute error in mm
                 cur.execute('''
                     CREATE TABLE IF NOT EXISTS vert_horz_results (
-                        test_subject INTEGER,
+                        test_subject,
+                        l_param FLOAT NOT NULL,
                         h_param FLOAT NOT NULL,
-                        h_subject_guess FLOAT NOT NULL,
                         d_param FLOAT NOT NULL,
+                        alpha_angle FLOAT NOT NULL,
                         beta_angle FLOAT NOT NULL,
-                        alpha_angle FLOAT NOT NULL
+                        desired_point_x FLOAT NOT NULL,
+                        desired_point_y FLOAT NOT NULL,
+                        subject_guess_x FLOAT NOT NULL,
+                        subject_guess_y FLOAT NOT NULL,
+                        absolute_error_pixels FLOAT NOT NULL,
+                        absolute_error_mm FLOAT NOT NULL
                     )
                 '''
                 )
@@ -209,34 +221,50 @@ class Manager():
         except sqlite3.Error as e:
             return e
             
-    def saveVertHorzResult(self, test_subject_id: int, h_param: float, 
-                            h_subject_guess: float, d_param: float, 
-                            beta_angle: float, alpha_angle: float):
+    def saveVertHorzResult(self, test_subject_id: int, l_param: float,
+                            h_param: float, d_param: float, alpha_angle: float,
+                            beta_angle: float, desired_point_x: float,
+                            desired_point_y: float, subject_guess_x: float,
+                            subject_guess_y: float, absolute_error_pixels: float,
+                            absolute_error_mm: float):
         '''
         test_subject id of test subject\n
-        h_param is length of vertical line\n
-        h_subject_guess is length at which the subject aligns the vertical line\n
-        d_param is horizontal offset of vertical\n
-        beta_angle is angle of vertical line\n
-        alpha_angle is angle of illusion rotation\n
+        l_param is length of vertical line\n
+        h_param is height at which lines aligned\n
+        d_param is offset from center\n
+        alpha_angle is angle of vertical line rotation\n
+        beta_angle is angle of illusion rotation\n
+        desired_point_x/y is cord of desired point\n
+        subject_guess_x/y is cord at which the subject aligns the vertical line\n
+        absolute_error_pixels is absolute error in pixels\n
+        absolute_error_mm is absolute error in mm\n
         '''
         try:
             result = (
                 test_subject_id,
+                l_param,
                 h_param,
-                h_subject_guess,
                 d_param,
+                alpha_angle,
                 beta_angle,
-                alpha_angle
+                desired_point_x,
+                desired_point_y,
+                subject_guess_x,
+                subject_guess_y,
+                absolute_error_pixels,
+                absolute_error_mm
             )
             with sqlite3.connect(self.database_path) as conn:
                 cur = conn.cursor()
                 cur.execute('''
                 INSERT INTO vert_horz_results (
-                    test_subject, h_param, h_subject_guess,
-                    d_param, beta_angle, alpha_angle
+                    test_subject, l_param, h_param,
+                    d_param, alpha_angle, beta_angle,
+                    desired_point_x, desired_point_y,
+                    subject_guess_x, subject_guess_y,
+                    absolute_error_pixels, absolute_error_mm
                 )
-                VALUES (?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ''', result)
                 conn.commit()
                 return True
