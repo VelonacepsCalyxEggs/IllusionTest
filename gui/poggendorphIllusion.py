@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import Canvas, messagebox
 from gui import testsPage
 import random
 from utils.geometry_utils import Vector2D, Line, pixel_to_mm
@@ -14,8 +14,11 @@ class PoggendorffIllusion(tk.Frame):
     illNum = 0 # number of the generated illusion
     intersection = Vector2D(0, 0)
     subject_response = Vector2D(0, 0)
+    canvas_size = Vector2D(720*1.5, 720)
     user_id = None
+    vert_length = 100 # length of the vertical line
 
+    scale = 7 # scale of the illusion
     line_colours = [
         'red',
         'blue',
@@ -41,7 +44,7 @@ class PoggendorffIllusion(tk.Frame):
         self.countdown(900)
 
         # Create canvas
-        self.canvas = tk.Canvas(self, width=512, height=512)
+        self.canvas = tk.Canvas(self, width=self.canvas_size.x, height=self.canvas_size.y, background="grey")
         self.canvas.grid(row=1, column=0, sticky='nsew')
 
         # Configure the row and column weights where the canvas is placed
@@ -54,8 +57,8 @@ class PoggendorffIllusion(tk.Frame):
         self.counter.grid()
 
         # Create slider to adjust the line position
-        self.slider = tk.Scale(self, from_=0, to=200, orient='horizontal', command=self.adjust_line)
-        self.slider.set(70)
+        self.slider = tk.Scale(self, from_= 0 + self.canvas_center.y - self.vert_length/2, to=self.canvas_center.y + self.vert_length/2, orient='horizontal', command=self.adjust_line)
+        self.slider.set(self.canvas_center.y)
         self.slider.grid()
         
         self.NextButton = tk.Button(self, text='Submit', command=self.submit_data)
@@ -101,34 +104,35 @@ class PoggendorffIllusion(tk.Frame):
         # Clear the canvas
         self.canvas.delete('all')
 
+        self.canvas_center = Vector2D(self.canvas_size.x/2, self.canvas_size.y/2)
+
         #Vertical lines using the Line class
-        line1 = Line(Vector2D(128, 0), Vector2D(0,1), 200)
+        line1 = Line(Vector2D(self.canvas_center.x, self.canvas_center.y - self.vert_length/2), Vector2D(0,1), self.vert_length)
         line1.swap_origin()
 
-        self.line2 = Line(Vector2D(128+self.w_param, 0), Vector2D(0,1), 200)
+        self.line2 = Line(Vector2D(self.canvas_center.x+self.w_param, self.canvas_center.y - self.vert_length/2), Vector2D(0,1), self.vert_length)
         self.line2.swap_origin()
         
-        self.center = Vector2D((line1.org.x + self.line2.org.x)/2, line1.len/2)
-        line1.rotate_around_point(self.beta, self.center)
-        self.line2.rotate_around_point(self.beta, self.center)
+        line1.rotate_around_point(self.beta, self.canvas_center)
+        self.line2.rotate_around_point(self.beta, self.canvas_center)
 
         line1.draw(self.canvas, color='black', width=1)
         self.line2.draw(self.canvas, color='black', width=1)
 
 
         # Diagonal line using the Line class
-        main_line = Line(Vector2D(128, 75), Vector2D(-1,0), 50)
+        main_line = Line(Vector2D(self.canvas_center.x, self.canvas_center.y), Vector2D(-1,0), 50)
         main_line.rotate(self.alpha)
-        main_line.rotate_around_point(self.beta, self.center)
+        main_line.rotate_around_point(self.beta, self.canvas_center)
         main_line.draw(self.canvas, color=self.line_colours[0], width=2)
 
         # Continuous line with the same angle as the diagonal line using the Line class
-        self.continuous_line = Line(Vector2D(128+self.w_param, 0 + line_pos), Vector2D(1,0), 50)
+        self.continuous_line = Line(Vector2D(self.canvas_center.x+self.w_param, 0 + line_pos), Vector2D(1,0), 50)
         self.continuous_line.rotate(self.alpha)
-        self.continuous_line.rotate_around_point(self.beta, self.center)
+        self.continuous_line.rotate_around_point(self.beta, self.canvas_center)
         self.subject_response = self.continuous_line.org
         
-        self.continuous_line_obj = self.continuous_line.draw(self.canvas, color=self.line_colours[0], width=2)
+        self.continuous_line.draw(self.canvas, color=self.line_colours[0], width=2)
 
         # DEBUG Square at the intersection of the lines
         self.intersection = Line.calculate_intersection(Line, main_line, self.line2)
@@ -139,7 +143,11 @@ class PoggendorffIllusion(tk.Frame):
             # Make the rectangle invisible
             self.canvas.itemconfig(self.debug_square, state='hidden')
 
-        self.canvas.scale('all', 0, 0, 2, 2) # TODO: Look into how the elements are positioned, currently this is causing problems.
+        # set scale of the canvas around the center of the screen
+        self.canvas.scale('all', self.canvas_center.x, self.canvas_center.y, self.scale, self.scale)
+        self.canvas.update()
+
+        
 
     def adjust_alpha(self, value):
         self.alpha = int(value)
@@ -168,8 +176,8 @@ class PoggendorffIllusion(tk.Frame):
         max_error_pixel = possible_values[0].magnitude() if possible_values[1].magnitude() < possible_values[0].magnitude() else possible_values[1].magnitude()
 
         # calculate the absolute error in mm
-        max_error_mm = pixel_to_mm(max_error_pixel, dpi, 2) # 2 is a magic number, it is the scale of the illusion
-        absolute_error_mm = pixel_to_mm(absolute_error, dpi, 2) # 2 is a magic number, it is the scale of the illusion
+        max_error_mm = pixel_to_mm(max_error_pixel, dpi, self.scale) # 2 is a magic number, it is the scale of the illusion
+        absolute_error_mm = pixel_to_mm(absolute_error, dpi, self.scale) # 2 is a magic number, it is the scale of the illusion
         
         print(f"Max error in mm: {max_error_mm}")
         print(f"Max error in pixels: {max_error_pixel}")
