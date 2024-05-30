@@ -98,8 +98,7 @@ class PoggendorffIllusion(tk.Frame):
             self.slider_beta = tk.Scale(self, from_=0, to=360, orient='horizontal', command=self.adjust_beta)
             self.slider_beta.set(self.beta)
             self.slider_beta.grid()
-
-    def draw_illusion(self, line_pos=0):
+    def draw_illusion(self, line_pos=360):
 
         # Clear the canvas
         self.canvas.delete('all')
