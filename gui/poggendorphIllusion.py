@@ -9,7 +9,6 @@ import json
 
 class PoggendorffIllusion(tk.Frame):
     w_param = 10 # width of the wall
-    h_param = 0 # offset of second line
     alpha = 45 # angle of the diagonal line
     beta = 0 # angle of illusion itself
     illNum = 0 # number of the generated illusion
@@ -81,14 +80,6 @@ class PoggendorffIllusion(tk.Frame):
             self.slider_w.set(self.w_param)
             self.slider_w.grid()
 
-            # Height of secondary line
-            self.debug_lables_height = tk.Label(self, text='Height of secondary line')
-            self.debug_lables_height.grid()
-
-            self.slider_h = tk.Scale(self, from_=0, to=200, orient='horizontal', command=self.adjust_h)
-            self.slider_h.set(self.h_param)
-            self.slider_h.grid()
-
             # Angle of the diagonal line
             self.debug_lables_alpha = tk.Label(self, text='Angle of the diagonal line')
             self.debug_lables_alpha.grid()
@@ -109,9 +100,7 @@ class PoggendorffIllusion(tk.Frame):
 
         # Clear the canvas
         self.canvas.delete('all')
-        # print(self.w_param, self.h_param, self.alpha, self.beta)
 
-        
         #Vertical lines using the Line class
         line1 = Line(Vector2D(128, 0), Vector2D(0,1), 200)
         line1.swap_origin()
@@ -132,11 +121,6 @@ class PoggendorffIllusion(tk.Frame):
         main_line.rotate(self.alpha)
         main_line.rotate_around_point(self.beta, self.center)
         main_line.draw(self.canvas, color=self.line_colours[0], width=2)
-
-        addional_line = Line(Vector2D(128+self.w_param, self.h_param), Vector2D(1,0), 50)
-        addional_line.rotate(self.alpha)
-        addional_line.rotate_around_point(self.beta, self.center)
-        addional_line.draw(self.canvas, color=self.line_colours[1], width=2)
 
         # Continuous line with the same angle as the diagonal line using the Line class
         self.continuous_line = Line(Vector2D(128+self.w_param, 0 + line_pos), Vector2D(1,0), 50)
@@ -162,9 +146,6 @@ class PoggendorffIllusion(tk.Frame):
     
     def adjust_beta(self, value):
         self.beta = int(value)
-    
-    def adjust_h(self, value):
-        self.h_param = int(value)
     
     def adjust_w(self, value):
         self.w_param = int(value)
@@ -199,7 +180,7 @@ class PoggendorffIllusion(tk.Frame):
         try:
             db = databaseManager.Manager()
             db.savePoggendorffResult(
-                self.user_id, self.w_param, self.h_param, self.alpha,
+                self.user_id, self.w_param, self.alpha,
                 self.beta, self.intersection.x, self.intersection.y,
                 self.subject_response.x, self.subject_response.y,
                 absolute_error, absolute_error_mm, max_error_pixel,

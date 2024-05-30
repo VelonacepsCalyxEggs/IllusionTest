@@ -36,7 +36,6 @@ class Manager():
                     CREATE TABLE IF NOT EXISTS poggendorff_results (
                         test_subject,
                         w_param FLOAT NOT NULL,
-                        h_param FLOAT NOT NULL,
                         alpha_angle FLOAT NOT NULL,
                         beta_angle FLOAT NOT NULL,
                         intersection_x FLOAT NOT NULL,
@@ -134,16 +133,17 @@ class Manager():
             return e
 
     def savePoggendorffResult(self, test_subject_id: int, w_param: float, 
-                            h_param: float, alpha_angle: float, 
-                            beta_angle: float, intersection_x: float,
-                            intersection_y: float, subject_guess_x: float,
-                            subject_guess_y: float, absolute_error_pixels: float,
-                            absolute_error_mm: float, max_error_pixels: float,
+                            alpha_angle: float, beta_angle: float, 
+                            intersection_x: float, intersection_y: float, 
+                            subject_guess_x: float, 
+                            subject_guess_y: float,
+                            absolute_error_pixels: float, 
+                            absolute_error_mm: float, 
+                            max_error_pixels: float,
                             max_error_mm: float):
         '''
         test_subject id of test subject\n
         w_param is width of wall\n
-        h_param is height at which lines aligned\n
         alpha_angle is angle of line rotation\n
         beta_angle is angle of illusion rotation\n
         intersection_x is x coordinate of intersection\n
@@ -159,7 +159,6 @@ class Manager():
             result = (
                 test_subject_id,
                 w_param,
-                h_param,
                 alpha_angle,
                 beta_angle,
                 intersection_x,
@@ -175,14 +174,14 @@ class Manager():
                 cur = conn.cursor()
                 cur.execute('''
                 INSERT INTO poggendorff_results (
-                    test_subject, w_param, h_param,
-                    alpha_angle, beta_angle, intersection_x,
+                    test_subject, w_param, alpha_angle, 
+                    beta_angle, intersection_x,
                     intersection_y, subject_guess_x,
                     subject_guess_y, absolute_error_pixels,
                     absolute_error_mm, max_error_pixels,
                     max_error_mm
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ''', result)
                 conn.commit()
                 return True
@@ -365,7 +364,7 @@ if __name__ == "__main__":
     print(test_subject_id)
     print(manager.getTestSubject(test_subject_id))
 
-    print(manager.savePoggendorffResult(test_subject_id, 3, 4.4, 5.4, 13, 3, 4, 5, 6, 7, 8, 3, 4))
+    print(manager.savePoggendorffResult(test_subject_id, 3, 4.4, 5.4, 13, 3, 4, 5, 6, 7, 8, 3))
     print(manager.saveMullerLyerResult(test_subject_id, 3, 4.4, 5.4, 13, 3, 4, 5, 6, 7, 8, 3))
     print(manager.saveVertHorzResult(test_subject_id, 32, 42, 5, 52, 3, 4, 5, 6, 7, 8, 3, 4, 3))
 
