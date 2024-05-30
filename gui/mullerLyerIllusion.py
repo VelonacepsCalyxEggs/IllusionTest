@@ -64,7 +64,7 @@ class MullerLyerIllusion(tk.Frame):
         self.NextButton = tk.Button(self, text='Submit', command=self.submit_data)
         self.NextButton.grid()
 
-        if self.debug == 'True':
+        if self.debug:
             # system buttons to redraw the illusion and sliders to adjast values
             self.debug_lables_title = tk.Label(self, text='Debug controls')
             self.debug_lables_title.grid()
@@ -130,23 +130,21 @@ class MullerLyerIllusion(tk.Frame):
         third_circle.draw(self.canvas, color=self.circles_outline[2],
                           fill=self.circles_fill[2], width=1)
         
-        #Debug lines and cercle
+        #Debug lines and circle
+        if self.debug:
+            self.line1 = Line(Vector2D(first_circle_pos.x + self.r_param, first_circle_pos.y + self.r_param), Vector2D(1, 0), self.d_param)
+            self.line2 = Line(Vector2D(second_circle_pos.x + self.r_param, second_circle_pos.y + self.r_param), Vector2D(1, 0), self.d_param)
 
-        self.line1 = Line(Vector2D(first_circle_pos.x + self.r_param, first_circle_pos.y + self.r_param), Vector2D(1, 0), self.d_param)
-        self.line2 = Line(Vector2D(second_circle_pos.x + self.r_param, second_circle_pos.y + self.r_param), Vector2D(1, 0), self.d_param)
+            self.line1.rotate_around_point(self.alpha, self.ill_center)
+            self.line2.rotate_around_point(self.alpha, self.ill_center)
 
-        self.line1.rotate_around_point(self.alpha, self.ill_center)
-        self.line2.rotate_around_point(self.alpha, self.ill_center)
+            self.canvas.create_line(self.line1.org.x, self.line1.org.y, self.line1.secn.x, self.line1.secn.y, fill='green', width=1)
+            self.canvas.create_line(self.line2.org.x, self.line2.org.y, self.line2.secn.x, self.line2.secn.y, fill='black', width=1)
 
-        self.canvas.create_line(self.line1.org.x, self.line1.org.y, self.line1.secn.x, self.line1.secn.y, fill='green', width=1)
-        self.canvas.create_line(self.line2.org.x, self.line2.org.y, self.line2.secn.x, self.line2.secn.y, fill='black', width=1)
-
-        self.debug_square = Circle(self.desired_point, 1)
-        self.debug_square.rotate_around_point(self.alpha, self.ill_center)
-        self.debug_square.draw(self.canvas, color='white', fill='white', width=1) # ЭТА ХУЙНЯ НЕ УМИРАЕТ, ТЕПЕРЬ ОНА БЕЛАЯ!!
+            self.debug_square = Circle(self.desired_point, 1)
+            self.debug_square.rotate_around_point(self.alpha, self.ill_center)
+            self.debug_square.draw(self.canvas, color='green', fill='green', width=1) 
         
-        if self.debug != 'True':
-            self.canvas.itemconfig(self.debug_square, state='hidden')
 
         self.canvas.scale('all', 0, 0, 2, 2) # TODO: Look into how the elements are positioned, currently this is causing problems.
 

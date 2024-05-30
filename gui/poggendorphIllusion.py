@@ -62,7 +62,7 @@ class PoggendorffIllusion(tk.Frame):
         self.NextButton = tk.Button(self, text='Submit', command=self.submit_data)
         self.NextButton.grid()
         
-        if self.debug == 'True':
+        if self.debug:
             # system buttons to redraw the illusion and sliders to adjust values
             self.debug_lables_title = tk.Label(self, text='Debug controls')
             self.debug_lables_title.grid()
@@ -151,7 +151,7 @@ class PoggendorffIllusion(tk.Frame):
         # Create the rectangle and keep a reference to it
         self.debug_square = self.canvas.create_rectangle(self.intersection.x-1, self.intersection.y-1, self.intersection.x+1, self.intersection.y+1, fill='green')
 
-        if self.debug != 'True':
+        if not self.debug:
             # Make the rectangle invisible
             self.canvas.itemconfig(self.debug_square, state='hidden')
 

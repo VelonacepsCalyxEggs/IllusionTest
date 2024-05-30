@@ -3,7 +3,8 @@ from tkinter import messagebox
 from PIL import Image, ImageTk
 from database import databaseManager
 from functions import exit
-from gui import poggendorphIllusion, mullerLyerIllusion, verticalHorizontalIllusion, dashboard
+from gui import poggendorphIllusion, mullerLyerIllusion, verticalHorizontalIllusion, dashboard, adminPage
+import json
 
 db = databaseManager.Manager()
 
@@ -13,6 +14,13 @@ class testsGUI(tk.Frame):
         super().__init__(master)
         self.grid(row=0, column=0, sticky="nsew")
         user = db.getTestSubject(user_id)
+        with open('./resources/config/config.json', 'r') as f:
+            # Read the file
+            file_content = f.read()
+            config = json.loads(file_content)
+            self.debug = config["Debug"]
+            print(self.debug)
+
         print(user)
         # Configure the master grid to center the frame
         master.grid_rowconfigure(0, weight=1)
@@ -102,6 +110,11 @@ class testsGUI(tk.Frame):
                 # Label for the tests page, centered at the top
         dashboard_button = tk.Button(self, text="Dashboard", command=lambda: switchPage(self=self, test_name="Dashboard", user_id=user_id))
         dashboard_button.grid(row=5, columnspan=3)
+        if self.debug:
+            debug_settings = tk.Button(self, text="Debug Settings", command=lambda: switchPage(self=self, test_name="Debug", user_id=user_id))
+            debug_settings.grid(row=6, columnspan=3)
+        exit_button = tk.Button(self, text="Exit", command=lambda:exit.closeWindow(self))
+        exit_button.grid(row=7, columnspan=3)
 
         if redirected:
             messagebox.showinfo("Good work!", f"You have passed the {redFrom} test!" )
@@ -114,7 +127,8 @@ def switchPage(self, test_name, user_id: int):
         "Poggendorff illusion": 1,
         "Müller-Lyer illusion": 2,
         "Vertical–horizontal illusion": 3,
-        "Dashboard": 4
+        "Dashboard": 4,
+        "Debug": 5
     }
 
     # Update the mapping if tests are passed
@@ -146,5 +160,8 @@ def switchPage(self, test_name, user_id: int):
         elif page == 4:
             dashboard_frame = dashboard.dashboardGUI(self.master, user_id=user_id)
             dashboard_frame.grid()
+        elif page == 5:
+            debug_frame = adminPage.adminGUI(self.master, user_id=user_id)
+            debug_frame.grid()
     else:
         messagebox.showerror("Error", "The selected test is not available.")

@@ -60,7 +60,7 @@ class verticalHorizontalIllusion(tk.Frame):
         
         self.NextButton = tk.Button(self, text='Submit', command=self.submit_data)
         self.NextButton.grid()
-        if self.debug == "True":
+        if self.debug:
             # system buttons to redraw the illusion and sliders to adjast values
             self.debug_lables_title = tk.Label(self, text='Debug controls')
             self.debug_lables_title.grid()
@@ -140,15 +140,13 @@ class verticalHorizontalIllusion(tk.Frame):
         self.vertical_line.draw(self.canvas, color=self.lines_colour[1], width=1)
 
         # Debug circle at desried point
-        # Я не понимаю блядь почему сука они не прячуться
-        #self.circle = Circle(self.desired_point, 1)
-        #self.circle.draw(self.canvas, color='white', width=1)
+        if self.debug:
+            self.circle = Circle(self.desired_point, 1)
+            self.circle.draw(self.canvas, color='white', width=1)
 
-        #self.center_circle = Circle(ill_center, 1)
-        #self.center_circle.draw(self.canvas, color='white', width=1)
-        #if self.debug != "True":
-        #    self.canvas.itemconfig(self.circle, state='hidden')
-        #    self.canvas.itemconfig(self.center_circle, state='hidden')
+            self.center_circle = Circle(self.ill_center, 1)
+            self.center_circle.draw(self.canvas, color='white', width=1)
+
             
         self.canvas.scale('all', 0, 0, 2, 2) # TODO: Look into how the elements are positioned, currently this is causing problems.
 
