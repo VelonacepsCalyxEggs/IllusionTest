@@ -36,9 +36,10 @@ class testsGUI(tk.Frame):
         # welcoming label
         testsPassed = 0
         try:
-            pgres = db.getPoggendorffResults(user[0])
-            mulres = db.getMullerLyerResults(user[0])
-            vhres = db.getVertHorzResults(user[0])
+            pgres = db.getPoggendorffResults(user_id)
+            print(pgres)
+            mulres = db.getMullerLyerResults(user_id)
+            vhres = db.getVertHorzResults(user_id)
         except Exception as e:
                 messagebox.showerror(
                     "Database Error", 
@@ -67,15 +68,6 @@ class testsGUI(tk.Frame):
             "Müller-Lyer illusion",
             "Vertical–horizontal illusion"
         ]
-        if len(pgres) > 0:
-            tests.remove('Poggendorff illusion')
-            image_paths.remove('./gui/res/pogandorph.png')
-        if len(mulres) > 0:
-            tests.remove('Müller-Lyer illusion')
-            image_paths.remove('./gui/res/muller.png')
-        if len(vhres) > 0:
-            tests.remove('Vertical–horizontal illusion')
-            image_paths.remove('./gui/res/verticalhorizontal.png')
 
 
         # Keep a list to store the image references
