@@ -37,7 +37,6 @@ class testsGUI(tk.Frame):
         testsPassed = 0
         try:
             pgres = db.getPoggendorffResults(user_id)
-            print(pgres)
             mulres = db.getMullerLyerResults(user_id)
             vhres = db.getVertHorzResults(user_id)
         except Exception as e:
@@ -122,17 +121,18 @@ def switchPage(self, test_name, user_id: int):
         "Dashboard": 4,
         "Debug": 5
     }
-
+    
+    # THIS MIGHT COME BACK AS AN OPTION IN CONFIG.
     # Update the mapping if tests are passed
-    pgres = db.getPoggendorffResults(user_id)
-    mulres = db.getMullerLyerResults(user_id)
-    vhres = db.getVertHorzResults(user_id)
-    if len(pgres) > 0:
-        del test_pages["Poggendorff illusion"]
-    if len(mulres) > 0:
-        del test_pages["Müller-Lyer illusion"]
-    if len(vhres) > 0:
-        del test_pages["Vertical–horizontal illusion"]
+    #pgres = db.getPoggendorffResults(user_id)
+    #mulres = db.getMullerLyerResults(user_id)
+    #vhres = db.getVertHorzResults(user_id)
+    #if len(pgres) > 0:
+    #    del test_pages["Poggendorff illusion"]
+    #if len(mulres) > 0:
+    #    del test_pages["Müller-Lyer illusion"]
+    #if len(vhres) > 0:
+    #    del test_pages["Vertical–horizontal illusion"]
 
     # Get the page number from the updated mapping
     page = test_pages.get(test_name)
