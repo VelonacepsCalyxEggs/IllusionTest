@@ -1,0 +1,29 @@
+{   
+    "general": {
+        "isTimeLimited": false,
+        "timeLimitInSec": 60
+    },
+    "illusions":[
+        {
+            "w_param": 10,
+            "alpha": 45,
+            "beta": 0,
+            "vert_length": 100,
+            "repeat": 3
+        },
+        {
+            "w_param": 20,
+            "alpha": 32,
+            "beta": 0.78,
+            "vert_length": 50,
+            "repeat": 1
+        },
+        {
+            "w_param": 30,
+            "alpha": 25,
+            "beta": 0.92,
+            "vert_length": 78,
+            "repeat": 2
+        }
+    ]
+}
