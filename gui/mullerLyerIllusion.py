@@ -35,11 +35,17 @@ class MullerLyerIllusion(tk.Frame):
             file_content = f.read()
             config = json.loads(file_content)
             self.debug = config["Debug"]
+            self.timer = config["Timer"]
+            self.showTimer = config['ShowTimer']
+            self.timerSnd = config['TimerSnd']
             print(self.debug)
+
         self.user_id = user_id
 
         self.timer = tk.Label(self, font=('Helvetica', 48), text="15:00")
         self.timer.grid(row=0, column=0, sticky='nsew')
+        if not self.showTimer:
+            self.timer.grid_forget()
         self.countdown_running = True
         self.countdown(900)
 
@@ -227,7 +233,8 @@ class MullerLyerIllusion(tk.Frame):
             mins, secs = divmod(time_remaining, 60)
             timeformat = '{:02d}:{:02d}'.format(mins, secs)
             self.timer.configure(text=timeformat)
-            self.tick_sound.play()
+            if self.timerSnd:
+                self.tick_sound.play()
             self.after(1000, self.countdown, time_remaining-1)
         elif not self.countdown_running:
             self.timer.configure(text="Timer stopped")

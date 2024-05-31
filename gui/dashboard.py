@@ -7,7 +7,11 @@ from functions import exit
 
 db = databaseManager.Manager()
 
+#
+# ЗАКРЫВАЙТЕ ЭТО ГОВНО НА КАРАНТИН, ОНО ЗАРАЗНО
+# TODO: Переписать к хуям
 class dashboardGUI(tk.Frame):
+
 
     def clearTestResults(self):
         # Remove all the test result widgets
@@ -34,11 +38,15 @@ class dashboardGUI(tk.Frame):
         else:
             return
         
+        if len(testResults) == 0:
+            messagebox.showwarning('Hmm...', f'No results found for {test}.')
+            return
+
         self.testResultWidgets = []
 
         # Create a label to display the test results header
         resultsLabel = tk.Label(self, text="Your Test Results")
-        resultsLabel.grid(row=start_row_index, columnspan=4)
+        resultsLabel.grid(row=start_row_index, sticky="nsew")
         self.testResultWidgets.append(resultsLabel)
 
         # Display each test result in a separate row
@@ -93,9 +101,8 @@ class dashboardGUI(tk.Frame):
 
     def __init__(self, master, user_id: int):
         super().__init__(master)
-        self.grid(row=0, column=0, sticky="nsew")
-        user = db.getTestSubject(user_id)
         self.testResultWidgets = []
+        self.grid(row=0, column=0, sticky="nsew")
 
         # Configure the master grid to center the frame
         master.grid_rowconfigure(0, weight=1)
@@ -106,23 +113,36 @@ class dashboardGUI(tk.Frame):
 
         # Label for the tests page, centered at the top
         header_label = tk.Label(self, text="This is the dashboard page")
-        header_label.grid(row=0, columnspan=3)
+        header_label.grid(row=0, column=0, sticky="nsew")
+
+        # Add padding to center the header_label horizontally and vertically
+        master.grid_rowconfigure(1, weight=1)
+        master.grid_columnconfigure(1, weight=1)
+
+        # Label for the tests page, centered at the top
+        header_label = tk.Label(self, text="This is the dashboard page")
+        header_label.grid(row=0, column=0)
+
         # Tests Dropdown
-        tk.Label(self, text="Choose the test you want to view data for").grid(row=1, columnspan=2)
+        tk.Label(self, text="Choose the test you want to view data for").grid(row=1, column=0, sticky="ew")
+
+                # Tests Dropdown
+        tk.Label(self, text="Choose the test you want to view data for").grid(row=1, sticky="ew")
         self.testVar = tk.StringVar()
         self.testVar.set("Select Test")  # default value
         self.testDropdown = tk.OptionMenu(self, self.testVar, "Poggendorph", "Muller", "Vertical-Horizontal")
-        self.testDropdown.grid(row=2, columnspan=2)
+        self.testDropdown.grid(row=2)
         # Call the function to display user results
         self.chooseButton = tk.Button(self, text='Choose', command=lambda: self.displayUserResults(user_id, self.testVar))
-        self.chooseButton.grid(row=3, columnspan=3)
+        self.chooseButton.grid(row=3, sticky="ew")
 
-        self.grid_rowconfigure(99, weight=1)
-
-        # Add a button to go back to tests
+        # Ensure that the 'backButton' is placed at the bottom of the grid
         backButton = tk.Button(self, text="Go to Tests Page", command=lambda: self.switchPage(user_id))
-        backButton.grid(row=99, columnspan=3, sticky='s')
+        backButton.grid(row=100, column=0, sticky='s')
 
+        # Add empty rows to push the backButton to the bottom
+        for i in range(2, 99):
+            self.grid_rowconfigure(i, weight=1)
 
         
 

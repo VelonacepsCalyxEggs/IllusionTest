@@ -36,9 +36,9 @@ class testsGUI(tk.Frame):
         # welcoming label
         testsPassed = 0
         try:
-            pgres = db.getPoggendorffResults(user[0])
-            mulres = db.getMullerLyerResults(user[0])
-            vhres = db.getVertHorzResults(user[0])
+            pgres = db.getPoggendorffResults(user_id)
+            mulres = db.getMullerLyerResults(user_id)
+            vhres = db.getVertHorzResults(user_id)
         except Exception as e:
                 messagebox.showerror(
                     "Database Error", 
@@ -67,15 +67,6 @@ class testsGUI(tk.Frame):
             "Müller-Lyer illusion",
             "Vertical–horizontal illusion"
         ]
-        if len(pgres) > 0:
-            tests.remove('Poggendorff illusion')
-            image_paths.remove('./gui/res/pogandorph.png')
-        if len(mulres) > 0:
-            tests.remove('Müller-Lyer illusion')
-            image_paths.remove('./gui/res/muller.png')
-        if len(vhres) > 0:
-            tests.remove('Vertical–horizontal illusion')
-            image_paths.remove('./gui/res/verticalhorizontal.png')
 
 
         # Keep a list to store the image references
@@ -130,17 +121,18 @@ def switchPage(self, test_name, user_id: int):
         "Dashboard": 4,
         "Debug": 5
     }
-
+    
+    # THIS MIGHT COME BACK AS AN OPTION IN CONFIG.
     # Update the mapping if tests are passed
-    pgres = db.getPoggendorffResults(user_id)
-    mulres = db.getMullerLyerResults(user_id)
-    vhres = db.getVertHorzResults(user_id)
-    if len(pgres) > 0:
-        del test_pages["Poggendorff illusion"]
-    if len(mulres) > 0:
-        del test_pages["Müller-Lyer illusion"]
-    if len(vhres) > 0:
-        del test_pages["Vertical–horizontal illusion"]
+    #pgres = db.getPoggendorffResults(user_id)
+    #mulres = db.getMullerLyerResults(user_id)
+    #vhres = db.getVertHorzResults(user_id)
+    #if len(pgres) > 0:
+    #    del test_pages["Poggendorff illusion"]
+    #if len(mulres) > 0:
+    #    del test_pages["Müller-Lyer illusion"]
+    #if len(vhres) > 0:
+    #    del test_pages["Vertical–horizontal illusion"]
 
     # Get the page number from the updated mapping
     page = test_pages.get(test_name)
