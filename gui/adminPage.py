@@ -11,8 +11,8 @@ class adminGUI(tk.Frame):
         self.load_config()
         self.create_widgets()
         self.grid(row=0, column=0, sticky="nsew")
-        master.grid_rowconfigure(0, weight=1)
-        master.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight=1)
         self.grid(padx=10, pady=10)
         
     def load_config(self):
