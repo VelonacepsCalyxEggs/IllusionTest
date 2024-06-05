@@ -150,7 +150,7 @@ def switchPage(self, test_name, user_id: int):
             illusion_frame = verticalHorizontalIllusion.verticalHorizontalIllusion(user_id=user_id)
             illusion_frame.grid()
         elif page == 4:
-            dashboard_frame = dashboard.dashboardGUI(self.master, user_id=user_id)
+            dashboard_frame = dashboard.dashboardGUI(user_id=user_id)
             dashboard_frame.grid()
         elif page == 5:
             debug_frame = adminPage.adminGUI(self.master, user_id=user_id)

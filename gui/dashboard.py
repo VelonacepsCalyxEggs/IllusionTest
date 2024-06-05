@@ -12,6 +12,12 @@ db = databaseManager.Manager()
 # TODO: Переписать к хуям
 class dashboardGUI(tk.Frame):
 
+    def calcErrorPrecentage(self, maxError, actualError):
+            actualError = min(actualError, maxError)
+            # Calculate the accuracy percentage
+            accuracyPercentage = (1 - (actualError / maxError)) * 100
+            return accuracyPercentage
+          
 
     def clearTestResults(self):
         # Remove all the test result widgets
@@ -48,37 +54,27 @@ class dashboardGUI(tk.Frame):
         resultsLabel = tk.Label(self, text="Your Test Results")
         resultsLabel.grid(row=start_row_index, sticky="nsew")
         self.testResultWidgets.append(resultsLabel)
-
+        j = 0
         # Display each test result in a separate row
         for i, result in enumerate(testResults, start=start_row_index + 1):
-
-
-
+            j = j + 1
             # Display the test-specific parameters
             if test == "Poggendorph":
                 maxError = result[11]  # This should be the maximum error possible 
                 actualError = result[9]  # The absolute error in pixels from the database
-                tk.Label(self, text=f"Test {i}:").grid(row=i, column=0)
-                tk.Label(self, text=f"Width of Wall: {result[1]}").grid(row=i, column=1)  # Assuming 'w_param' is at index 1
+                accuracyPercentage = self.calcErrorPrecentage(maxError, actualError)
+                tk.Label(self, text=f"Test {j}: Accuracy: {accuracyPercentage}% ").grid(row=i, column=0)
             elif test == "Muller":
                 maxError = result[10]  # This should be the maximum error possible 
                 actualError = result[8]  # The absolute error in pixels from the database
-                tk.Label(self, text=f"Test {i}:").grid(row=i, column=0)
-                tk.Label(self, text=f"Size of Circles: {result[1]}").grid(row=i, column=1)  # Assuming 'r_param' is at index 1
-                tk.Label(self, text=f"Distance Between Circles: {result[2]}").grid(row=i, column=2)  # Assuming 'd_param' is at index 2
+                accuracyPercentage = self.calcErrorPrecentage(maxError, actualError)
+                tk.Label(self, text=f"Test {j}: Accuracy: {accuracyPercentage}% ").grid(row=i, column=0)
             elif test == "Vertical-Horizontal":
                 maxError = result[12]  # This should be the maximum error possible 
                 actualError = result[10]  # The absolute error in pixels from the database
-                tk.Label(self, text=f"Test {i}:").grid(row=i, column=0)
-                tk.Label(self, text=f"Length of Vertical Line: {result[1]}").grid(row=i, column=1)  # Assuming 'l_param' is at index 1
-                tk.Label(self, text=f"Height at Which Lines Aligned: {result[2]}").grid(row=i, column=2)  # Assuming 'h_param' is at index 2
-                        # Ensure actualError does not exceed maxError
-            actualError = min(actualError, maxError)
+                accuracyPercentage = self.calcErrorPrecentage(maxError, actualError)
+                tk.Label(self, text=f"Test {j}: Accuracy: {accuracyPercentage}% ").grid(row=i, column=0)
 
-            # Calculate the accuracy percentage
-            accuracyPercentage = (1 - (actualError / maxError)) * 100
-            # Display accuracy for all tests
-            tk.Label(self, text=f"Accuracy: {accuracyPercentage:.2f}%").grid(row=i, column=3)
 
             # Add the created widgets to the list for tracking
             self.testResultWidgets.extend([
@@ -99,25 +95,17 @@ class dashboardGUI(tk.Frame):
             newPage = testsPage.testsGUI(self.master, user_id, False, "Dashboard")
             newPage.grid(row=0, column=0, sticky="nsew")
 
-    def __init__(self, master, user_id: int):
-        super().__init__(master)
+    def __init__(self, user_id: int):
+        super().__init__()
         self.testResultWidgets = []
         self.grid(row=0, column=0, sticky="nsew")
 
         # Configure the master grid to center the frame
-        master.grid_rowconfigure(0, weight=1)
-        master.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight=1, minsize=200)
 
         # Center the frame within the master
         self.grid(padx=10, pady=10)
-
-        # Label for the tests page, centered at the top
-        header_label = tk.Label(self, text="This is the dashboard page")
-        header_label.grid(row=0, column=0, sticky="nsew")
-
-        # Add padding to center the header_label horizontally and vertically
-        master.grid_rowconfigure(1, weight=1)
-        master.grid_columnconfigure(1, weight=1)
 
         # Label for the tests page, centered at the top
         header_label = tk.Label(self, text="This is the dashboard page")

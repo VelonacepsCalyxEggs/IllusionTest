@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import Canvas, messagebox
 from gui import testsPage
-import random
 from utils.geometry_utils import Vector2D, Line, pixel_to_mm
 from utils.poggendorphDataStore import Test
 from database import databaseManager
@@ -18,7 +17,7 @@ class PoggendorffIllusion(tk.Frame):
     subject_response = Vector2D(0, 0)
     canvas_size = Vector2D(720*1.5, 720)
     user_id = None
-    path = "resources\\tests\\poggendorp.json"
+    path = "resources\\tests\\poggendorph.json"
     test_data = Test(path)
 
     scale = 7 # scale of the illusion
@@ -59,7 +58,7 @@ class PoggendorffIllusion(tk.Frame):
         self.countdown(900)
 
         # Create canvas
-        self.canvas = tk.Canvas(self, width=self.canvas_size.x, height=self.canvas_size.y, background="grey")
+        self.canvas = tk.Canvas(self, width=self.canvas_size.x, height=self.canvas_size.y, background="white")
         self.canvas.grid(row=1, column=0, sticky='nsew')
 
         # Configure the row and column weights where the canvas is placed
