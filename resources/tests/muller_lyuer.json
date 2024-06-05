@@ -1,0 +1,32 @@
+{   
+    "general": {
+        "isTimeLimited": false,
+        "timeLimitInSec": 60
+    },
+    "illusions":[
+        {
+            "r_param": 10,
+            "d_param": 45,
+            "alpha": 0,
+            "circle_fill":["blue", "blue", "red"],
+            "circle_outline":["black","black","black"],
+            "repeat": 2
+        },
+        {
+            "r_param": 5,
+            "d_param": 23,
+            "alpha": -13,
+            "circle_fill":["blue", "blue", "red"],
+            "circle_outline":["black","black","black"],
+            "repeat": 2
+        },
+        {
+            "r_param": 24,
+            "d_param": 63,
+            "alpha": 24,
+            "circle_fill":["blue", "blue", "red"],
+            "circle_outline":["black","black","black"],
+            "repeat": 2
+        }
+    ]
+}

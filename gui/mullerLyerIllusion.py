@@ -3,6 +3,7 @@ from tkinter import messagebox
 from gui import testsPage
 import random
 from utils.geometry_utils import Vector2D, Line, Circle, pixel_to_mm
+from utils.mullerLyerDataStore import Test
 from database import databaseManager
 from pygame import mixer  # Cross-platform solution
 import json
@@ -14,6 +15,8 @@ class MullerLyerIllusion(tk.Frame):
     desired_point = Vector2D(4*r_param + 2*d_param, 128)
     subject_response = Vector2D(0, 0)
     user_id = None
+    path = 'resources\\tests\\muller_lyuer.json'
+    test_data = Test(path)
     circles_fill = [
         'blue',
         'blue',
@@ -41,6 +44,12 @@ class MullerLyerIllusion(tk.Frame):
             print(self.debug)
 
         self.user_id = user_id
+
+        illusion = self.test_data.get_next_illusion()
+        self.r_param = illusion.r_param
+        self.d_param = illusion.d_param
+        self.circles_fill = illusion.fill
+        self.circles_outline = illusion.outline
 
         self.timer = tk.Label(self, font=('Helvetica', 48), text="15:00")
         self.timer.grid(row=0, column=0, sticky='nsew')
@@ -200,13 +209,15 @@ class MullerLyerIllusion(tk.Frame):
             print(f"An error occurred while trying to save the data\n{e}")
     
         # Generate a new illusion
-        self.r_param = random.randint(2, 25) # width of the wall
-        self.d_param = random.randint(10, 100) # offset of second line
-        self.alpha = random.randint(0, 360) # angle of the illusion
+        illusion = self.test_data.get_next_illusion()
+        self.r_param = illusion.r_param
+        self.d_param = illusion.d_param
+        self.circles_fill = illusion.fill
+        self.circles_outline = illusion.outline
 
         # If user had reached 10 illusions, we redirect to the tests page.
         # On the tests page, we show the user a message box with info that he had completed this test. i.e prob verified by database query.
-        if self.illNum != 9:
+        if self.illNum != self.test_data.illusion_amount - 1:
             self.draw_illusion()
 
             self.illNum = self.illNum + 1

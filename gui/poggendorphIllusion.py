@@ -18,7 +18,7 @@ class PoggendorffIllusion(tk.Frame):
     subject_response = Vector2D(0, 0)
     canvas_size = Vector2D(720*1.5, 720)
     user_id = None
-    path = "resources\\tests\poggendorp.json"
+    path = "resources\\tests\\poggendorp.json"
     test_data = Test(path)
 
     scale = 7 # scale of the illusion
@@ -113,6 +113,7 @@ class PoggendorffIllusion(tk.Frame):
             self.slider_beta = tk.Scale(self, from_=0, to=360, orient='horizontal', command=self.adjust_beta)
             self.slider_beta.set(self.beta)
             self.slider_beta.grid()
+    
     def draw_illusion(self, line_pos=360):
 
         # Clear the canvas
