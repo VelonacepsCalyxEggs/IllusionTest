@@ -154,6 +154,7 @@ cython_debug/
 
 /database/svodb.db
 database/svodb.db
+exports/
 
 # PyCharm
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can

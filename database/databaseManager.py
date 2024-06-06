@@ -1,4 +1,7 @@
+import os
 import sqlite3
+import datetime
+from openpyxl import Workbook
 
 class Manager():
     database_path = ''
@@ -353,23 +356,96 @@ class Manager():
         except sqlite3.Error as e:
             return e
 
+    def exportTablesToXlsx(self):
+        '''Export the given table to a xlsx file. The table must be one of the following:
+        poggendorff_results, muller_lyer_results, test_subjects or vert_horz_results'''
+        date = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M')
+        path = 'exports/' # ends with '/'!!
+        wb = Workbook()
+
+        try:
+            if not os.path.exists(path):
+                os.makedirs(path)
+
+            for table in self.getTablesNames():
+                name = f'{date}.xlsx'
+                header = ()
+
+                match table:
+                    case 'poggendorff_results':
+                        header = ('Test Subject', 'w_param', 'Alpha', 'Beta', 'Desired Point', 'Guess Point', 'Absolute Error px', 'Absolute Error mm', 'Max Error px', 'Max Error mm')
+
+                    case 'muller_lyer_results':
+                        header = ('Test Subject', 'r_param', 'd_param', 'Alpha', 'Desired Point', 'Guess Point', 'Absolute Error px', 'Absolute Error mm', 'Max Error px', 'Max Error mm')
+                    
+                    case 'vert_horz_results':
+                        header = ('Test Subject', 'l_param', 'h_param', 'd_param', 'Alpha', 'Beta', 'Desired Point', 'Guess Point', 'Absolute Error px', 'Absolute Error mm', 'Max Error px', 'Max Error mm')
+
+                    case 'test_subjects':
+                        header = ('id', 'Name', 'Age', 'Gender')
+
+                    case _:
+                        raise ValueError('The given table is not available.')
+
+                with sqlite3.connect(self.database_path) as conn:
+                    cur = conn.cursor()
+                    cur.execute(f'''SELECT * FROM {table}''')
+
+                    ws = wb.create_sheet(table, 0)
+                    ws = wb[table]
+                    ws.append(header)
+
+                    for row in cur.fetchall():
+                        match table:
+                            case 'poggendorff_results':
+                                ws.append((row[0], row[1], row[2], row[3], f'{row[4]}; {row[5]}', f'{row[6]}; {row[7]}', row[8], row[9], row[10], row[11]))
+                            
+                            case'muller_lyer_results':
+                                ws.append((row[0], row[1], row[2], row[3], f'{row[4]}; {row[5]}', f'{row[6]}; {row[7]}', row[8], row[9], row[10], row[11]))
+                            
+                            case'vert_horz_results':
+                                ws.append((row[0], row[1], row[2], row[3], row[4], row[5], f'{row[6]}; {row[7]}', f'{row[8]}; {row[9]}', row[10], row[11], row[12], row[13]))
+                            
+                            case _:
+                                ws.append(row)
+
+                    
+                    wb.save(path + name)
+
+        except sqlite3.Error as e:
+            return e
+        
+    def getTablesNames(self):
+        '''Return a list of the tables names in the database'''
+        try:
+            with sqlite3.connect(self.database_path) as conn:
+                cur = conn.cursor()
+                return [table[0] for table in cur.execute('''SELECT name FROM sqlite_master WHERE type='table';''')]
+        except sqlite3.Error as e:
+            return e
+
 if __name__ == "__main__":
     manager = Manager()
     test_subject_name = 'John Doe'
     test_subject_age = 25
 
-    print(manager.saveTestSubject(test_subject_name, test_subject_age, 'ThermoNuclearMissile'))
+    # print(manager.saveTestSubject(test_subject_name, test_subject_age, 'ThermoNuclearMissile'))
 
-    test_subject_id = manager.getTestSubjectId(test_subject_name, test_subject_age)
-    print(test_subject_id)
-    print(manager.getTestSubject(test_subject_id))
+    # test_subject_id = manager.getTestSubjectId(test_subject_name, test_subject_age)
+    # print(test_subject_id)
+    # print(manager.getTestSubject(test_subject_id))
 
-    print(manager.savePoggendorffResult(test_subject_id, 3, 4.4, 5.4, 13, 3, 4, 5, 6, 7, 8, 3))
-    print(manager.saveMullerLyerResult(test_subject_id, 3, 4.4, 5.4, 13, 3, 4, 5, 6, 7, 8, 3))
-    print(manager.saveVertHorzResult(test_subject_id, 32, 42, 5, 52, 3, 4, 5, 6, 7, 8, 3, 4, 3))
+    # print(manager.savePoggendorffResult(test_subject_id, 3, 4.4, 5.4, 13, 3, 4, 5, 6, 7, 8, 3))
+    # print(manager.saveMullerLyerResult(test_subject_id, 3, 4.4, 5.4, 13, 3, 4, 5, 6, 7, 8, 3))
+    # print(manager.saveVertHorzResult(test_subject_id, 32, 42, 5, 52, 3, 4, 5, 6, 7, 8, 3, 4, 3))
 
-    print(manager.getPoggendorffResults(test_subject_id))
-    print(manager.getMullerLyerResults(test_subject_id))
-    print(manager.getVertHorzResults(test_subject_id))
+    # print(manager.getPoggendorffResults(test_subject_id))
+    # print(manager.getMullerLyerResults(test_subject_id))
+    # print(manager.getVertHorzResults(test_subject_id))
+
+    # manager.exportTableToXlsx('poggendorff_results')
+
+    #export all tables to xlsx
+    manager.exportTablesToXlsx()
 
 
