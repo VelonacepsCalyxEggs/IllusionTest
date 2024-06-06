@@ -1,0 +1,35 @@
+{   
+    "general": {
+        "isTimeLimited": false,
+        "timeLimitInSec": 60
+    },
+    "illusions":[
+        {
+            "l_param": 64,
+            "h_param": 75,
+            "d_param": 0,
+            "alpha": 0,
+            "beta": 0,
+            "lines_colour": ["blue", "red"],
+            "repeat": 2
+        },
+        {
+            "l_param": 35,
+            "h_param": 10,
+            "d_param": 14,
+            "alpha": 4,
+            "beta": 3,
+            "lines_colour": ["green", "blue"],
+            "repeat": 2
+        },
+        {
+            "l_param": 104,
+            "h_param": 23,
+            "d_param": -4,
+            "alpha": 55,
+            "beta": 3,
+            "lines_colour": ["blue", "red"],
+            "repeat": 2
+        }
+    ]
+}
