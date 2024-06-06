@@ -37,6 +37,6 @@ if __name__ == "__main__":
 
     app.mainloop()
 
-#TODO: SEPARATE THE GUI AND FUNCTIONS INTO SEPARATE FILES
+#TODO: DO
 #PS: TODO IS A LIE
 #PPS: READ OVER 1 LINE ABOVE
