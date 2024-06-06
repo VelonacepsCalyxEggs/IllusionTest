@@ -15,7 +15,7 @@ class PoggendorffIllusion(tk.Frame):
     illNum = 0 # number of the generated illusion
     intersection = Vector2D(0, 0)
     subject_response = Vector2D(0, 0)
-    canvas_size = Vector2D(720*1.5, 720)
+    canvas_size = Vector2D(1024*1.5, 1024)
     user_id = None
     path = "resources\\tests\\poggendorph.json"
     test_data = Test(path)
@@ -31,7 +31,9 @@ class PoggendorffIllusion(tk.Frame):
 
     def __init__(self, user_id: int):
         super().__init__()
-                # check config
+        self.pack(fill='both', expand=True)  # This line ensures that the frame expands
+
+        # check config
         with open('./resources/config/config.json', 'r') as f:
             # Read the file
             file_content = f.read()
@@ -49,73 +51,99 @@ class PoggendorffIllusion(tk.Frame):
         self.beta = illusion.beta
         self.vert_length = illusion.vert_length
 
+        # Get the screen width and height
+        screen_width = self.master.winfo_screenwidth() - 512
+        screen_height = self.master.winfo_screenheight()
 
-        # Create canvas
-        self.canvas = tk.Canvas(self, width=self.canvas_size.x, height=self.canvas_size.y)
-        self.canvas.grid(row=1, column=0, sticky='nsew')
-        self.countdown_running = True
-        if self.timerOpt:
-            self.timer = tk.Label(self, font=('Helvetica', 48), text="15:00")
-            self.countdown(900)
-        else:
-            self.timer = tk.Label(self, font=('Helvetica', 48), text="00:00:00")
-            self.countdown(0)
-        self.timer.grid()
-        if not self.showTimer:
-            self.timer.grid_forget()
-        
-        # Configure the row and column weights where the canvas is placed
-        self.grid_rowconfigure(0, weight=1)
-        self.grid_columnconfigure(0, weight=1)
+        # Create canvas with the screen resolution
+        self.canvas = tk.Canvas(self, width=screen_width, height=screen_height)
+        self.canvas.pack(side='left', fill='both', expand=True)
+
+        # Interaction panel elements
+        self.interaction_panel = tk.Frame(self)
+        self.interaction_panel.pack(side='right', fill='y', expand=True)
+
+        self.countdown_running = False
 
         self.draw_illusion()
-
-        self.counter = tk.Label(self, text=f'Test number {self.illNum} out of {self.test_data.illusion_amount}')
-        self.counter.grid()
-
-        # Create slider to adjust the line position
-        self.slider = tk.Scale(self, from_= 0 + self.canvas_center.y - self.vert_length/2, to=self.canvas_center.y + self.vert_length/2, orient='horizontal', command=self.adjust_line)
-        self.slider.set(self.canvas_center.y)
-        self.slider.grid()
         
-        self.NextButton = tk.Button(self, text='Submit', command=self.submit_data)
-        self.NextButton.grid()
+        # Assuming you have a method to create the interaction panel elements
+        # Create the interaction panel frame
+        self.interaction_panel = tk.Frame(self)
+        self.interaction_panel.pack(side='right', fill='y')
+
+        # Timer label
+        self.timer = tk.Label(self.interaction_panel, font=('Helvetica', 48), text="15:00" if self.timerOpt else "00:00:00")
+        self.timer.pack(fill='x')
+        if self.timerOpt:
+            self.countdown(900)
+        else:
+            self.countdown(0)
+        if not self.showTimer:
+            self.timer.pack_forget()
+
+        # Test counter label
+        self.counter = tk.Label(self.interaction_panel, text=f'Test number {self.illNum} out of {self.test_data.illusion_amount}')
+        self.counter.pack(fill='x')
+
+        # Slider to adjust the line position
+        self.slider = tk.Scale(self.interaction_panel, from_=0 + self.canvas_center.y - self.vert_length/2, to=self.canvas_center.y + self.vert_length/2, orient='horizontal', command=self.adjust_line)
+        # CANVAS CENTER IS NOT CANVAS CENTER ANYMORE?
+        print(self.canvas_center.y)
+        self.slider.set(self.canvas_center.y)
+        self.slider.pack(fill='x', pady=24)
+        # Set the slider to take focus
+        self.slider.takefocus = True
+
+        # Bind the left and right arrow keys to the slider
+        self.slider.bind('<Left>', lambda event: self.slider.set(self.slider.get() - 1))
+        self.slider.bind('<Right>', lambda event: self.slider.set(self.slider.get() + 1))
+        
+        # Submit button
+        self.NextButton = tk.Button(self.interaction_panel, text='Submit', command=self.submit_data)
+        self.NextButton.pack(fill='x', pady=24)
+
+
+
+
         
         if self.debug:
             # system buttons to redraw the illusion and sliders to adjust values
             self.debug_lables_title = tk.Label(self, text='Debug controls')
-            self.debug_lables_title.grid()
+            self.debug_lables_title.pack()
 
             # Create a button to redraw the illusion
             self.redraw_button = tk.Button(self, text='Redraw', command=self.draw_illusion)
-            self.redraw_button.grid()
+            self.redraw_button.pack()
 
             # Create sliders to adjust the parameters of the illusion
         
             # Width of the wall
             self.debug_lables_widht = tk.Label(self, text='Width of the wall')
-            self.debug_lables_widht.grid()
+            self.debug_lables_widht.pack()
             
             self.slider_w = tk.Scale(self, from_=10, to=100, orient='horizontal', command=self.adjust_w)
             self.slider_w.set(self.w_param)
-            self.slider_w.grid()
+            self.slider_w.pack()
 
             # Angle of the diagonal line
             self.debug_lables_alpha = tk.Label(self, text='Angle of the diagonal line')
-            self.debug_lables_alpha.grid()
+            self.debug_lables_alpha.pack()
 
             self.slider_alpha = tk.Scale(self, from_=-90, to=90, orient='horizontal', command=self.adjust_alpha)
             self.slider_alpha.set(self.alpha)
-            self.slider_alpha.grid()
+            self.slider_alpha.pack()
 
             # Angle of the illusion
             self.debug_lables_beta = tk.Label(self, text='Angle of the illusion')
-            self.debug_lables_beta.grid()
+            self.debug_lables_beta.pack()
             
             self.slider_beta = tk.Scale(self, from_=0, to=360, orient='horizontal', command=self.adjust_beta)
             self.slider_beta.set(self.beta)
-            self.slider_beta.grid()
-    
+            self.slider_beta.pack()
+
+
+
     def draw_illusion(self, line_pos=360):
 
         # Clear the canvas
@@ -226,13 +254,10 @@ class PoggendorffIllusion(tk.Frame):
     def switchPage(self):
         self.stop_countdown()
         # Hide the current frame
-        self.grid_forget()
-        # Create and show a new frame or page using the grid manager
+        self.pack_forget()
+        # Create and show a new frame or page using the pack manager
         newPage = testsPage.testsGUI(self.master, self.user_id, True, "Poggendorf Illusion")
         newPage.grid(row=0, column=0, sticky="nsew")
-        # Configure the master grid to center the new frame
-        self.master.grid_rowconfigure(0, weight=1)
-        self.master.grid_columnconfigure(0, weight=1)
 
     def stop_countdown(self):
         self.countdown_running = False
