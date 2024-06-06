@@ -2,7 +2,6 @@ import tkinter as tk
 from tkinter import messagebox
 from PIL import Image, ImageTk
 from database import databaseManager
-from functions import exit
 from gui import poggendorphIllusion, mullerLyerIllusion, verticalHorizontalIllusion, dashboard, adminPage
 import json
 
@@ -44,7 +43,7 @@ class testsGUI(tk.Frame):
                     "Database Error", 
                     f"An error occurred while trying to retrieve data.\n{e}"
                     )
-                exit.closeWindow()
+                quit()
         if len(pgres) > 0:
             testsPassed = testsPassed + 1
         if len(mulres) > 0:
@@ -104,7 +103,7 @@ class testsGUI(tk.Frame):
         if self.debug:
             debug_settings = tk.Button(self, text="Debug Settings", command=lambda: switchPage(self=self, test_name="Debug", user_id=user_id))
             debug_settings.grid(row=6, columnspan=3)
-        exit_button = tk.Button(self, text="Exit", command=lambda:exit.closeWindow(self))
+        exit_button = tk.Button(self, text="Exit", command=lambda:self.quit())
         exit_button.grid(row=7, columnspan=3)
 
         if redirected:

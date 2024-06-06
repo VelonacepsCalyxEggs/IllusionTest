@@ -37,7 +37,7 @@ class PoggendorffIllusion(tk.Frame):
             file_content = f.read()
             config = json.loads(file_content)
             self.debug = config["Debug"]
-            self.timer = config["Timer"]
+            self.timerOpt = config["Timer"]
             self.showTimer = config['ShowTimer']
             self.timerSnd = config['TimerSnd']
             print(self.debug)
@@ -50,17 +50,21 @@ class PoggendorffIllusion(tk.Frame):
         self.beta = illusion.beta
         self.vert_length = illusion.vert_length
 
-        self.timer = tk.Label(self, font=('Helvetica', 48), text="15:00")
-        self.timer.grid(row=0, column=0, sticky='nsew')
-        if not self.showTimer:
-            self.timer.grid_forget()
-        self.countdown_running = True
-        self.countdown(900)
 
         # Create canvas
         self.canvas = tk.Canvas(self, width=self.canvas_size.x, height=self.canvas_size.y, background="white")
         self.canvas.grid(row=1, column=0, sticky='nsew')
-
+        self.countdown_running = True
+        if self.timerOpt:
+            self.timer = tk.Label(self, font=('Helvetica', 48), text="15:00")
+            self.countdown(900)
+        else:
+            self.timer = tk.Label(self, font=('Helvetica', 48), text="00:00:00")
+            self.countdown(0)
+        self.timer.grid()
+        if not self.showTimer:
+            self.timer.grid_forget()
+        
         # Configure the row and column weights where the canvas is placed
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
@@ -224,7 +228,7 @@ class PoggendorffIllusion(tk.Frame):
             self.draw_illusion()
 
             self.illNum = self.illNum + 1
-            self.counter.configure(text=self.illNum)
+            self.counter.configure(text=f'Test number {self.illNum} out of {self.test_data.illusion_amount}')
         else:
             self.switchPage()
 
@@ -243,19 +247,27 @@ class PoggendorffIllusion(tk.Frame):
         self.countdown_running = False
 
     def countdown(self, time_remaining):
-        if time_remaining > 0 and self.countdown_running:
-            mins, secs = divmod(time_remaining, 60)
-            timeformat = '{:02d}:{:02d}'.format(mins, secs)
-            self.timer.configure(text=timeformat)
-            if self.timerSnd:
-                self.tick_sound.play()
-            self.after(1000, self.countdown, time_remaining-1)
-        elif not self.countdown_running:
-            self.timer.configure(text="Timer stopped")
-        else:
-            self.timer.configure(text="Time's up!")
-            self.times_up()
-
+        if self.timerOpt:
+            if time_remaining > 0 and self.countdown_running:
+                mins, secs = divmod(time_remaining, 60)
+                timeformat = '{:02d}:{:02d}'.format(mins, secs)
+                self.timer.configure(text=timeformat)
+                if self.timerSnd:
+                    self.tick_sound.play()
+                self.after(1000, self.countdown, time_remaining-1)
+            elif not self.countdown_running:
+                self.timer.configure(text="Timer stopped")
+            else:
+                self.timer.configure(text="Time's up!")
+                self.times_up()
+        else: 
+            if self.countdown_running:
+                mins, secs = divmod(time_remaining, 60)
+                timeformat = '{:02d}:{:02d}'.format(mins, secs)
+                self.timer.configure(text=timeformat)
+                if self.timerSnd:
+                        self.tick_sound.play()
+                self.after(1000, self.countdown, time_remaining+1)
     def times_up(self):
         # This function will be called when the timer ends
         messagebox.showinfo("Timer", "Time's up!")

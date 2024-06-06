@@ -207,8 +207,8 @@ class verticalHorizontalIllusion(tk.Frame):
             print(f"An error occurred while trying to save the data\n{e}")
     
         # Generate a new illusion
-        self.h_param = random.randint(10, 128) # height of the vertical lines
-        self.l_param = random.randint(10, 128) # length of the horizontal line
+        self.h_param = random.randint(10, 96) # height of the vertical lines
+        self.l_param = random.randint(10, 96) # length of the horizontal line
         self.alpha = random.randint(-90, 90) # angle of the vertical line
         self.beta = random.randint(0, 360)
 
