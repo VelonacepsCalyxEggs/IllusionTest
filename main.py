@@ -1,5 +1,4 @@
 import tkinter as tk
-from functions import exit 
 from gui import registerPage
 import json
 class App(tk.Tk):

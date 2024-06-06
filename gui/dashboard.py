@@ -1,9 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 from gui import testsPage
-from PIL import Image, ImageTk
 from database import databaseManager
-from functions import exit
 
 db = databaseManager.Manager()
 
@@ -78,10 +76,7 @@ class dashboardGUI(tk.Frame):
 
             # Add the created widgets to the list for tracking
             self.testResultWidgets.extend([
-                tk.Label(self, text=f"Test {i}:"),
-                tk.Label(self, text=f"Size of Circles: {result[1]}"),
-                tk.Label(self, text=f"Distance Between Circles: {result[2]}"),
-                tk.Label(self, text=f"Accuracy: {accuracyPercentage:.2f}%")
+                tk.Label(self, text=f"Test {j}: Accuracy: {accuracyPercentage}% "),
             ])
 
         # Update the layout to ensure the new widgets are displayed correctly

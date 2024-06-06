@@ -37,7 +37,6 @@ class verticalHorizontalIllusion(tk.Frame):
             self.timer = config["Timer"]
             self.showTimer = config['ShowTimer']
             self.timerSnd = config['TimerSnd']
-            print(self.debug)
 
         self.user_id = user_id
 
@@ -187,9 +186,6 @@ class verticalHorizontalIllusion(tk.Frame):
     def submit_data(self):
         
         # SEND DATA TO SQL DB
-        print(f"Desired point: {self.desired_point}")
-        print(f"Subject response: {self.subject_response}")
-        print(f"Error in pixels: {self.desired_point - self.subject_response}")
         dpi = self.winfo_fpixels('1i')
         
 
@@ -198,13 +194,7 @@ class verticalHorizontalIllusion(tk.Frame):
         
         max_error_pixel = (self.desired_point - self.vertical_line.org).magnitude()
         max_error_mm = pixel_to_mm(max_error_pixel, dpi, 2) # 2 is a magic number, it is the scale of the illusion
-        
-        print(f"Max error in mm: {max_error_mm}")
-        print(f"Max error in pixels: {max_error_pixel}")
-
-        print(f"Absolute error in mm: {absolute_error_mm}")
-        print(f"Absolute error in pixels: {absolute_error}")
-
+    
         try:
             db = databaseManager.Manager()
             db.saveVertHorzResult(

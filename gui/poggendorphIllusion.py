@@ -40,7 +40,6 @@ class PoggendorffIllusion(tk.Frame):
             self.timerOpt = config["Timer"]
             self.showTimer = config['ShowTimer']
             self.timerSnd = config['TimerSnd']
-            print(self.debug)
 
         self.user_id = user_id
 
@@ -182,9 +181,6 @@ class PoggendorffIllusion(tk.Frame):
     def submit_data(self):
         
         # SEND DATA TO SQL DB
-        print(f"Intersection: {self.intersection}")
-        print(f"Subject response: {self.subject_response}")
-        print(f"Error in pixels: {self.intersection - self.subject_response}")
         absolute_error = (self.intersection - self.subject_response).magnitude()
         
         dpi = self.winfo_fpixels('1i')
@@ -196,12 +192,6 @@ class PoggendorffIllusion(tk.Frame):
         # calculate the absolute error in mm
         max_error_mm = pixel_to_mm(max_error_pixel, dpi, self.scale) # 2 is a magic number, it is the scale of the illusion
         absolute_error_mm = pixel_to_mm(absolute_error, dpi, self.scale) # 2 is a magic number, it is the scale of the illusion
-        
-        print(f"Max error in mm: {max_error_mm}")
-        print(f"Max error in pixels: {max_error_pixel}")
-
-        print(f"Absolute error in mm: {absolute_error_mm}")
-        print(f"Absolute error in pixels: {absolute_error}")
 
         try:
             db = databaseManager.Manager()

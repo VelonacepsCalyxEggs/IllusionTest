@@ -18,9 +18,7 @@ class testsGUI(tk.Frame):
             file_content = f.read()
             config = json.loads(file_content)
             self.debug = config["Debug"]
-            print(self.debug)
 
-        print(user)
         # Configure the master grid to center the frame
         master.grid_rowconfigure(0, weight=1)
         master.grid_columnconfigure(0, weight=1)

@@ -1,7 +1,7 @@
 {
-    "Debug": false,
+    "Debug": true,
     "DarkTheme": false,
     "Timer": false,
-    "ShowTimer": false,
-    "TimerSnd": false
+    "ShowTimer": true,
+    "TimerSnd": true
 }
