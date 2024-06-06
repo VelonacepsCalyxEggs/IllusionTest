@@ -51,7 +51,7 @@ class PoggendorffIllusion(tk.Frame):
 
 
         # Create canvas
-        self.canvas = tk.Canvas(self, width=self.canvas_size.x, height=self.canvas_size.y, background="white")
+        self.canvas = tk.Canvas(self, width=self.canvas_size.x, height=self.canvas_size.y)
         self.canvas.grid(row=1, column=0, sticky='nsew')
         self.countdown_running = True
         if self.timerOpt:
