@@ -65,9 +65,7 @@ class PoggendorffIllusion(tk.Frame):
 
         self.countdown_running = False
 
-        self.draw_illusion()
-        
-        # Assuming you have a method to create the interaction panel elements
+                # Assuming you have a method to create the interaction panel elements
         # Create the interaction panel frame
         self.interaction_panel = tk.Frame(self)
         self.interaction_panel.pack(side='right', fill='y')
@@ -85,23 +83,13 @@ class PoggendorffIllusion(tk.Frame):
         # Test counter label
         self.counter = tk.Label(self.interaction_panel, text=f'Test number {self.illNum} out of {self.test_data.illusion_amount}')
         self.counter.pack(fill='x')
-
-        # Slider to adjust the line position
-        self.slider = tk.Scale(self.interaction_panel, from_=0 + self.canvas_center.y - self.vert_length/2, to=self.canvas_center.y + self.vert_length/2, orient='horizontal', command=self.adjust_line)
-        # CANVAS CENTER IS NOT CANVAS CENTER ANYMORE?
-        print(self.canvas_center.y)
-        self.slider.set(self.canvas_center.y)
-        self.slider.pack(fill='x', pady=24)
-        # Set the slider to take focus
-        self.slider.takefocus = True
-
-        # Bind the left and right arrow keys to the slider
-        self.slider.bind('<Left>', lambda event: self.slider.set(self.slider.get() - 1))
-        self.slider.bind('<Right>', lambda event: self.slider.set(self.slider.get() + 1))
         
         # Submit button
         self.NextButton = tk.Button(self.interaction_panel, text='Submit', command=self.submit_data)
         self.NextButton.pack(fill='x', pady=24)
+
+        self.draw_illusion(sliderCreate=True)
+        
 
 
 
@@ -144,7 +132,7 @@ class PoggendorffIllusion(tk.Frame):
 
 
 
-    def draw_illusion(self, line_pos=360):
+    def draw_illusion(self, line_pos=360, sliderCreate=False):
 
         # Clear the canvas
         self.canvas.delete('all')
@@ -191,6 +179,22 @@ class PoggendorffIllusion(tk.Frame):
         # set scale of the canvas around the center of the screen
         self.canvas.scale('all', self.canvas_center.x, self.canvas_center.y, self.scale, self.scale)
         self.canvas.update()
+
+        if sliderCreate:
+             # Slider to adjust the line position
+            self.slider = tk.Scale(self.interaction_panel, from_=0 + self.canvas_center.y - self.vert_length/2, to=self.canvas_center.y + self.vert_length/2, orient='horizontal', command=self.adjust_line)
+            # CANVAS CENTER IS NOT CANVAS CENTER ANYMORE?
+            print(self.canvas_center.y)
+            self.slider.set(self.canvas_center.y)
+            self.slider.pack(fill='x', pady=24)
+            # Set the slider to take focus
+            self.slider.takefocus = True
+
+            # Bind the left and right arrow keys to the slider
+            #self.slider.bind('<Left>', lambda event: self.slider.set(self.slider.get() - 1))
+            #self.slider.bind('<Right>', lambda event: self.slider.set(self.slider.get() + 1))
+
+            self.slider.set(self.canvas_center.y)
 
         
 
@@ -244,7 +248,8 @@ class PoggendorffIllusion(tk.Frame):
         # If user had reached 10 illusions, we redirect to the tests page.
         # On the tests page, we show the user a message box with info that he had completed this test. i.e prob verified by database query.
         if self.illNum != self.test_data.illusion_amount-1:
-            self.draw_illusion()
+            self.slider.destroy()
+            self.draw_illusion(sliderCreate=True)
 
             self.illNum = self.illNum + 1
             self.counter.configure(text=f'Test number {self.illNum} out of {self.test_data.illusion_amount}')
@@ -254,6 +259,7 @@ class PoggendorffIllusion(tk.Frame):
     def switchPage(self):
         self.stop_countdown()
         # Hide the current frame
+        self.grid_forget()
         self.pack_forget()
         # Create and show a new frame or page using the pack manager
         newPage = testsPage.testsGUI(self.master, self.user_id, True, "Poggendorf Illusion")
