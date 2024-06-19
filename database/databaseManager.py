@@ -366,9 +366,10 @@ class Manager():
         try:
             if not os.path.exists(path):
                 os.makedirs(path)
-
+            i = 1
             for table in self.getTablesNames():
-                name = f'{date}.xlsx'
+                name = f'{date}_{table}_{i}.xlsx'
+                i += 1
                 header = ()
 
                 match table:

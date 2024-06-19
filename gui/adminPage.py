@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox, Label, Button, IntVar, Radiobutton
+from database import databaseManager
 from gui import testsPage
 import json
 
@@ -14,6 +15,10 @@ class adminGUI(tk.Frame):
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=0)
         self.grid(padx=10, pady=10)
+
+        self.db = databaseManager.Manager()
+
+
         
     def load_config(self):
         with open('./resources/config/config.json', 'r') as f:
@@ -23,6 +28,14 @@ class adminGUI(tk.Frame):
         with open('./resources/config/config.json', 'w') as f:
             json.dump(self.config, f, indent=4)
 
+    def export_data(self):
+        #avaivableResults = ['poggendorff_results','muller_lyer_results','vert_horz_results', 'test_subjects']
+        #for result in avaivableResults:
+            #db.exportTablesToXlsx(result)
+
+        self.db.exportTablesToXlsx()
+        messagebox.showinfo("Info", "All data was exported to /exports.")
+        
     def create_widgets(self):
         # Debug setting
         self.debug_var = IntVar(value=self.config["Debug"])
@@ -57,6 +70,9 @@ class adminGUI(tk.Frame):
         Button(self, text="Save", command=self.update_config).grid(row=10, columnspan=3)
         Button(self, text="Back", command=lambda: self.switchPage(user_id=self.user_id)).grid(row=11, columnspan=3)
 
+        # Button to export to excel.
+        Label(self, text="Export all data to excel.").grid(row=13, column=0)
+        Button(self, text="Export", command=self.export_data).grid(row=14, columnspan=3)
 
     def update_config(self):
         self.config["Debug"] = bool(self.debug_var.get())

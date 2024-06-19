@@ -63,7 +63,7 @@ class PoggendorffIllusion(tk.Frame):
         self.interaction_panel = tk.Frame(self)
         self.interaction_panel.pack(side='right', fill='y', expand=True)
 
-        self.countdown_running = False
+        self.countdown_running = True
 
                 # Assuming you have a method to create the interaction panel elements
         # Create the interaction panel frame
