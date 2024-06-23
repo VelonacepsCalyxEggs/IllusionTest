@@ -1,8 +1,4 @@
 # IllusionTest
 > [!IMPORTANT]
-> The
-
-## Illusions to add
-+ [Poggendorff illusion](https://en.wikipedia.org/wiki/Poggendorff_illusion)
-+ [Müller-Lyer illusion](https://en.wikipedia.org/wiki/M%C3%BCller-Lyer_illusion)
-+ [Vertical–horizontal illusion](https://en.wikipedia.org/wiki/Vertical%E2%80%93horizontal_illusion)
+> To use this application, you have to use python version above 3.9 and download all the requirements from the requirements.txt
+> This project was made by Ivan K, Daniil M, and Alexei F.
