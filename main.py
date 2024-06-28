@@ -18,10 +18,6 @@ class App(tk.Tk):
         frame = registerPage.registerGUI(self)
         frame.tkraise()
 
-
-
-
-
 if __name__ == "__main__":
     app = App()
     
@@ -31,6 +27,7 @@ if __name__ == "__main__":
     # Make it resize to full screen, avoided using the fullscreen true parameter since we probable would want to use the width and height values as globals
     width = app.winfo_screenwidth()
     height = app.winfo_screenheight()
+    app.attributes("-fullscreen", True) 
     app.geometry(f"{width}x{height}+0+0")
     app.state('zoomed')  # Maximize the window
 
